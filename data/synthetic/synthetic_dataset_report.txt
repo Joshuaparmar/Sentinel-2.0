@@ -1,0 +1,58 @@
+SENTINEL 2.0 SYNTHETIC DATASET REPORT
+================================================
+Random seed: 42
+Source file: C:\Users\Shirley\joshua\CRCE\CAPSTONE\Sentinel\dataset\ClusterWise_mini\olcf_task\train.parquet
+Sample interval: 10 seconds
+Telemetry features: 28
+
+TRAIN
+------------------------------------------------
+Rows: 518,400
+Hosts: 100
+Time start: 2020-01-01 00:00:00
+Time end: 2020-01-01 14:23:50
+Label counts: {0: 518400}
+Anomaly type counts:
+anomaly_type
+normal    518400
+
+VALIDATION
+------------------------------------------------
+Rows: 172,800
+Hosts: 100
+Time start: 2020-01-01 14:24:00
+Time end: 2020-01-01 19:11:50
+Label counts: {0: 172032, 1: 768}
+Anomaly type counts:
+anomaly_type
+normal                 172032
+multi_host_event          260
+gradual_degradation       186
+abrupt_power_drop         152
+thermal_anomaly           150
+transient_spike            20
+
+TEST
+------------------------------------------------
+Rows: 172,800
+Hosts: 100
+Time start: 2020-01-01 19:12:00
+Time end: 2020-01-01 23:59:50
+Label counts: {0: 172032, 1: 768}
+Anomaly type counts:
+anomaly_type
+normal                 172032
+multi_host_event          260
+gradual_degradation       186
+abrupt_power_drop         152
+thermal_anomaly           150
+transient_spike            20
+
+IMPORTANT LIMITATIONS
+------------------------------------------------
+Injected anomalies have known synthetic ground truth.
+They are not confirmed real hardware failures.
+XID and identifiers must not be model input features.
+The test set contains controlled synthetic scenarios.
+Synthetic performance does not establish real-world
+failure-detection performance.

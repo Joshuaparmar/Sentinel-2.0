@@ -1,0 +1,341 @@
+{
+  "title": "SENTINEL 2.0 synthetic dataset report",
+  "seed": 42,
+  "source": "C:\\Users\\Shirley\\joshua\\CRCE\\CAPSTONE\\Sentinel\\dataset\\ClusterWise_mini\\olcf_task\\train.parquet",
+  "source_sha256_before": "93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7",
+  "source_sha256_after": "93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7",
+  "source_unchanged": true,
+  "split_boundaries": {
+    "train_end": "2020-01-01 14:23:50+00:00",
+    "val_start": "2020-01-01 14:24:50+00:00",
+    "val_end": "2020-01-01 19:11:50+00:00",
+    "test_start": "2020-01-01 19:12:50+00:00",
+    "purge_steps": 5
+  },
+  "purged_rows": 1000,
+  "model_features": [
+    "gpu0_core_temp",
+    "gpu0_mem_temp",
+    "gpu1_core_temp",
+    "gpu1_mem_temp",
+    "gpu2_core_temp",
+    "gpu2_mem_temp",
+    "gpu3_core_temp",
+    "gpu3_mem_temp",
+    "gpu4_core_temp",
+    "gpu4_mem_temp",
+    "gpu5_core_temp",
+    "gpu5_mem_temp",
+    "p0_gpu0_power",
+    "p0_gpu1_power",
+    "p0_gpu2_power",
+    "p0_power",
+    "p0_temp_max",
+    "p0_temp_mean",
+    "p0_temp_min",
+    "p1_gpu0_power",
+    "p1_gpu1_power",
+    "p1_gpu2_power",
+    "p1_power",
+    "p1_temp_max",
+    "p1_temp_mean",
+    "p1_temp_min",
+    "ps0_input_power",
+    "ps1_input_power"
+  ],
+  "feature_count": 28,
+  "feature_envelopes": {
+    "gpu0_core_temp": {
+      "min": 22.85,
+      "max": 48.65
+    },
+    "gpu0_mem_temp": {
+      "min": 19.2625,
+      "max": 52.1125
+    },
+    "gpu1_core_temp": {
+      "min": 21.688888931274413,
+      "max": 49.42222175598145
+    },
+    "gpu1_mem_temp": {
+      "min": 18.95,
+      "max": 55.55
+    },
+    "gpu2_core_temp": {
+      "min": 21.4,
+      "max": 52.6
+    },
+    "gpu2_mem_temp": {
+      "min": 18.82222213745117,
+      "max": 56.95555648803711
+    },
+    "gpu3_core_temp": {
+      "min": 21.8,
+      "max": 48.2
+    },
+    "gpu3_mem_temp": {
+      "min": 19.2,
+      "max": 52.8
+    },
+    "gpu4_core_temp": {
+      "min": 21.7,
+      "max": 49.3
+    },
+    "gpu4_mem_temp": {
+      "min": 18.022222137451173,
+      "max": 53.75555648803711
+    },
+    "gpu5_core_temp": {
+      "min": 20.3,
+      "max": 64.7
+    },
+    "gpu5_mem_temp": {
+      "min": 17.775,
+      "max": 68.475
+    },
+    "p0_gpu0_power": {
+      "min": 2.386111450195312,
+      "max": 336.7527740478516
+    },
+    "p0_gpu1_power": {
+      "min": 3.099999999999998,
+      "max": 337.9
+    },
+    "p0_gpu2_power": {
+      "min": 2.871100262450902,
+      "max": 339.08456886596974
+    },
+    "p0_power": {
+      "min": -1.1208326339721708,
+      "max": 256.32916660308837
+    },
+    "p0_temp_max": {
+      "min": 15.899999999999999,
+      "max": 77.1
+    },
+    "p0_temp_mean": {
+      "min": 18.238724915313718,
+      "max": 48.333276816558836
+    },
+    "p0_temp_min": {
+      "min": 18.511110877990724,
+      "max": 43.044444465637206
+    },
+    "p1_gpu0_power": {
+      "min": 2.3222217559814453,
+      "max": 335.7888889312744
+    },
+    "p1_gpu1_power": {
+      "min": 3.388888549804687,
+      "max": 334.72222595214845
+    },
+    "p1_gpu2_power": {
+      "min": 0.8497120712277919,
+      "max": 334.65315958709976
+    },
+    "p1_power": {
+      "min": -0.19999980926513672,
+      "max": 246.20000553131104
+    },
+    "p1_temp_max": {
+      "min": 17.888888931274415,
+      "max": 55.222221755981444
+    },
+    "p1_temp_mean": {
+      "min": 18.198544568634006,
+      "max": 50.34040603103669
+    },
+    "p1_temp_min": {
+      "min": 18.45555477142334,
+      "max": 44.98888988494873
+    },
+    "ps0_input_power": {
+      "min": 81.31554565429687,
+      "max": 1598.8622497558595
+    },
+    "ps1_input_power": {
+      "min": 167.83876511230469,
+      "max": 1102.241930444336
+    }
+  },
+  "splits": {
+    "train": {
+      "rows": 518400,
+      "hosts": 100,
+      "label_counts": {
+        "0": 518400
+      },
+      "anomaly_type_counts": {
+        "normal": 518400
+      }
+    },
+    "validation": {
+      "rows": 172300,
+      "hosts": 100,
+      "label_counts": {
+        "0": 172177,
+        "1": 123
+      },
+      "anomaly_type_counts": {
+        "normal": 172177,
+        "multi_host_event": 48,
+        "gradual_degradation": 32,
+        "thermal_anomaly": 24,
+        "abrupt_power_drop": 16,
+        "transient_spike": 3
+      }
+    },
+    "test": {
+      "rows": 172300,
+      "hosts": 100,
+      "label_counts": {
+        "0": 172195,
+        "1": 105
+      },
+      "anomaly_type_counts": {
+        "normal": 172195,
+        "multi_host_event": 44,
+        "gradual_degradation": 24,
+        "thermal_anomaly": 18,
+        "abrupt_power_drop": 16,
+        "transient_spike": 3
+      }
+    }
+  },
+  "events": [
+    {
+      "event_id": "VAL_E01",
+      "split": "validation",
+      "anomaly_type": "multi_host_event",
+      "start_time": "2020-01-01T16:53:10+00:00",
+      "end_time": "2020-01-01T16:55:00+00:00",
+      "duration_steps": 12,
+      "hosts": "d20n09;d03n10;d28n18;d20n04",
+      "target_severity": 0.7258818873766545,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "VAL_E02",
+      "split": "validation",
+      "anomaly_type": "thermal_anomaly",
+      "start_time": "2020-01-01T17:15:50+00:00",
+      "end_time": "2020-01-01T17:19:40+00:00",
+      "duration_steps": 24,
+      "hosts": "g02n14",
+      "target_severity": 5.513140819978173,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "VAL_E03",
+      "split": "validation",
+      "anomaly_type": "transient_spike",
+      "start_time": "2020-01-01T15:46:10+00:00",
+      "end_time": "2020-01-01T15:46:30+00:00",
+      "duration_steps": 3,
+      "hosts": "f17n06",
+      "target_severity": 1.453030803114348,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "VAL_E04",
+      "split": "validation",
+      "anomaly_type": "abrupt_power_drop",
+      "start_time": "2020-01-01T15:38:10+00:00",
+      "end_time": "2020-01-01T15:40:40+00:00",
+      "duration_steps": 16,
+      "hosts": "d21n12",
+      "target_severity": 0.46657675767664475,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "VAL_E05",
+      "split": "validation",
+      "anomaly_type": "gradual_degradation",
+      "start_time": "2020-01-01T18:49:20+00:00",
+      "end_time": "2020-01-01T18:54:30+00:00",
+      "duration_steps": 32,
+      "hosts": "c30n16",
+      "target_severity": 0.5572793608268557,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "TEST_E01",
+      "split": "test",
+      "anomaly_type": "transient_spike",
+      "start_time": "2020-01-01T20:28:40+00:00",
+      "end_time": "2020-01-01T20:29:00+00:00",
+      "duration_steps": 3,
+      "hosts": "c35n14",
+      "target_severity": 1.6071881020670313,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "TEST_E02",
+      "split": "test",
+      "anomaly_type": "gradual_degradation",
+      "start_time": "2020-01-01T20:19:50+00:00",
+      "end_time": "2020-01-01T20:23:40+00:00",
+      "duration_steps": 24,
+      "hosts": "d20n15",
+      "target_severity": 0.49028347993344873,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "TEST_E03",
+      "split": "test",
+      "anomaly_type": "abrupt_power_drop",
+      "start_time": "2020-01-01T23:39:20+00:00",
+      "end_time": "2020-01-01T23:41:50+00:00",
+      "duration_steps": 16,
+      "hosts": "d21n18",
+      "target_severity": 0.37674479989297605,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "TEST_E04",
+      "split": "test",
+      "anomaly_type": "multi_host_event",
+      "start_time": "2020-01-01T20:52:20+00:00",
+      "end_time": "2020-01-01T20:54:00+00:00",
+      "duration_steps": 11,
+      "hosts": "c32n09;d20n08;c31n12;g02n11",
+      "target_severity": 0.6873403307195884,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    },
+    {
+      "event_id": "TEST_E05",
+      "split": "test",
+      "anomaly_type": "thermal_anomaly",
+      "start_time": "2020-01-01T20:11:50+00:00",
+      "end_time": "2020-01-01T20:14:40+00:00",
+      "duration_steps": 18,
+      "hosts": "c31n15",
+      "target_severity": 6.87033715421496,
+      "realized_median_power_change_pct": null,
+      "realized_median_temp_change": null
+    }
+  ],
+  "assumptions": {
+    "window_steps": 5,
+    "train_frac": 0.6,
+    "val_frac": 0.2,
+    "envelope_headroom_fraction": 0.1,
+    "envelopes_are_training_derived_not_physical_sensor_specs": true,
+    "scenario_severity_ranges": {
+      "abrupt_power_drop": "power multiplier 0.35-0.50",
+      "thermal_anomaly": "temperature offset +5 to +8 degrees",
+      "transient_spike": "power multiplier 1.35-1.65",
+      "gradual_degradation": "power multiplier declines from 1.0 to 0.45-0.65",
+      "multi_host_event": "power multiplier 0.60-0.75; temperature offset +2"
+    }
+  }
+}

@@ -1,0 +1,651 @@
+{
+  "audit_type": "read_only_project_inventory",
+  "generated_at_utc": "2026-10-22T14:38:38.102175+00:00",
+  "project_root": "C:\\Users\\Shirley\\joshua\\CRCE\\CAPSTONE\\Sentinel_2.0",
+  "python_version": "3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "summary": {
+    "directory_count": 36,
+    "file_count": 107,
+    "total_file_size_bytes": 1370202946,
+    "extension_counts": {
+      ".bak": 5,
+      ".bak_20261022_172008": 1,
+      ".csv": 31,
+      ".joblib": 8,
+      ".json": 22,
+      ".md": 3,
+      ".metrics_backup": 1,
+      ".parquet": 15,
+      ".precision_backup": 1,
+      ".pt": 2,
+      ".py": 14,
+      ".txt": 4
+    },
+    "root_files": [
+      "README.md"
+    ]
+  },
+  "directories": [
+    "configs",
+    "data",
+    "data/original",
+    "data/processed",
+    "data/synthetic",
+    "data/synthetic_v3",
+    "docs",
+    "experiments",
+    "experiments/v3_xgboost_run_001",
+    "experiments/v3_xgboost_run_001/model",
+    "experiments/v3_xgboost_run_001/predictions",
+    "experiments/v3_xgboost_run_001/reports",
+    "models",
+    "models/comparison",
+    "models/comparison_v3_run_001",
+    "reports",
+    "reports/feature_ablation",
+    "reports/feature_residual_diagnostic",
+    "reports/feature_residual_diagnostic/baseline_25_iterations",
+    "reports/model_comparison",
+    "reports/model_comparison_v3_run_001",
+    "reports/pre_supervised_benchmark_backup_20261021_225935",
+    "reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison",
+    "reports/pre_supervised_benchmark_backup_20261021_225935/models",
+    "scripts",
+    "src",
+    "src/sentinel",
+    "src/sentinel_generator_package",
+    "src/sentinel_generator_package/sentinel_generator_package",
+    "src/sentinel_generator_package/sentinel_generator_package/src",
+    "src/sentinel_generator_package/sentinel_generator_package/src/sentinel",
+    "src/sentinel_generator_package/sentinel_generator_package/tests",
+    "src/sentinel_generator_package_v3",
+    "synthetic_output_v1",
+    "synthetic_output_v2",
+    "tests"
+  ],
+  "files": [
+    {
+      "path": "data/synthetic/synthetic_dataset_report.txt",
+      "extension": ".txt",
+      "size_bytes": 1689
+    },
+    {
+      "path": "data/synthetic/synthetic_test.parquet",
+      "extension": ".parquet",
+      "size_bytes": 6816238
+    },
+    {
+      "path": "data/synthetic/synthetic_train.parquet",
+      "extension": ".parquet",
+      "size_bytes": 20725363
+    },
+    {
+      "path": "data/synthetic/synthetic_val.parquet",
+      "extension": ".parquet",
+      "size_bytes": 6955465
+    },
+    {
+      "path": "data/synthetic_v3/feature_manifest.json",
+      "extension": ".json",
+      "size_bytes": 2021,
+      "sha256": "e42eedd32dbf92a1a40ef645c20b83356cbfaac60b856d34e3fa029b4c544e43"
+    },
+    {
+      "path": "data/synthetic_v3/generation_config.json",
+      "extension": ".json",
+      "size_bytes": 6610,
+      "sha256": "0bb38e33593065a2c22be87dd1e0de051057e3412982d2cb848d411be4d05526"
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_events.csv",
+      "extension": ".csv",
+      "size_bytes": 94684
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_report.json",
+      "extension": ".json",
+      "size_bytes": 32596,
+      "sha256": "4c7ba57baf24f3d87086c68a21cc93fe5eb175e22166185eae1f4447ae60af3b"
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_report.txt",
+      "extension": ".txt",
+      "size_bytes": 9609
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_supervised_train.parquet",
+      "extension": ".parquet",
+      "size_bytes": 24212161
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_supervised_train_events.csv",
+      "extension": ".csv",
+      "size_bytes": 79665
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_test.parquet",
+      "extension": ".parquet",
+      "size_bytes": 7695163
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_train.parquet",
+      "extension": ".parquet",
+      "size_bytes": 23073416
+    },
+    {
+      "path": "data/synthetic_v3/synthetic_val.parquet",
+      "extension": ".parquet",
+      "size_bytes": 7790035
+    },
+    {
+      "path": "data/synthetic_v3/validation_results.json",
+      "extension": ".json",
+      "size_bytes": 6236,
+      "sha256": "f9aa0acf92ac609358c7e4bf9dc4dbade49dc4ffdff3b2defb0cb39e053215a7"
+    },
+    {
+      "path": "docs/PROJECT_PLAN.md",
+      "extension": ".md",
+      "size_bytes": 0
+    },
+    {
+      "path": "experiments/v3_xgboost_run_001/model/xgboost_v3.json",
+      "extension": ".json",
+      "size_bytes": 1897410,
+      "sha256": "293d0d92a47db5fe3f5724dfdb68e66949ed293afb13f055ffae93fb7860cb2a"
+    },
+    {
+      "path": "experiments/v3_xgboost_run_001/predictions/test_predictions.parquet",
+      "extension": ".parquet",
+      "size_bytes": 2016096
+    },
+    {
+      "path": "experiments/v3_xgboost_run_001/reports/experiment_report.json",
+      "extension": ".json",
+      "size_bytes": 6695,
+      "sha256": "e3f151e3dbde4e447a986e933a20fc6422efb8bdf555862a1f28198c0362a769"
+    },
+    {
+      "path": "experiments/v3_xgboost_run_001/reports/feature_importance.csv",
+      "extension": ".csv",
+      "size_bytes": 762
+    },
+    {
+      "path": "experiments/v3_xgboost_run_001/reports/test_event_detection.csv",
+      "extension": ".csv",
+      "size_bytes": 3233
+    },
+    {
+      "path": "models/comparison/lightgbm_supervised.joblib",
+      "extension": ".joblib",
+      "size_bytes": 1057348
+    },
+    {
+      "path": "models/comparison/preprocessing.json",
+      "extension": ".json",
+      "size_bytes": 3042,
+      "sha256": "8c9be3fcb6f8a543675ca7a61300a18099385eb1a65c8c374dca2be372ffac75"
+    },
+    {
+      "path": "models/comparison/xgboost_supervised.joblib",
+      "extension": ".joblib",
+      "size_bytes": 927433
+    },
+    {
+      "path": "models/comparison_v3_run_001/cnn_autoencoder_state_dict.pt",
+      "extension": ".pt",
+      "size_bytes": 38295
+    },
+    {
+      "path": "models/comparison_v3_run_001/dense_autoencoder.joblib",
+      "extension": ".joblib",
+      "size_bytes": 78196
+    },
+    {
+      "path": "models/comparison_v3_run_001/gaussian_mixture.joblib",
+      "extension": ".joblib",
+      "size_bytes": 4811
+    },
+    {
+      "path": "models/comparison_v3_run_001/isolation_forest.joblib",
+      "extension": ".joblib",
+      "size_bytes": 2571181
+    },
+    {
+      "path": "models/comparison_v3_run_001/lightgbm_supervised.joblib",
+      "extension": ".joblib",
+      "size_bytes": 1057812
+    },
+    {
+      "path": "models/comparison_v3_run_001/lstm_autoencoder_state_dict.pt",
+      "extension": ".pt",
+      "size_bytes": 155849
+    },
+    {
+      "path": "models/comparison_v3_run_001/pca_reconstruction.joblib",
+      "extension": ".joblib",
+      "size_bytes": 3514
+    },
+    {
+      "path": "models/comparison_v3_run_001/preprocessing.json",
+      "extension": ".json",
+      "size_bytes": 3045,
+      "sha256": "cb4686533f4cd905b01b5d01edce572776a313d791bceeaa3e442b71f568104f"
+    },
+    {
+      "path": "models/comparison_v3_run_001/xgboost_comparison_run.joblib",
+      "extension": ".joblib",
+      "size_bytes": 1155153
+    },
+    {
+      "path": "README.md",
+      "extension": ".md",
+      "size_bytes": 0
+    },
+    {
+      "path": "reports/feature_ablation/ablation_metadata.json",
+      "extension": ".json",
+      "size_bytes": 2261,
+      "sha256": "52aa343d32ac38d07eb4f6c1f40b9d9e64bb456b729699a549257f0b816ecb7a"
+    },
+    {
+      "path": "reports/feature_ablation/ablation_scores_test.csv",
+      "extension": ".csv",
+      "size_bytes": 51964674
+    },
+    {
+      "path": "reports/feature_ablation/ablation_summary.csv",
+      "extension": ".csv",
+      "size_bytes": 2020
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/baseline_25_iterations/channel_separation_summary.csv",
+      "extension": ".csv",
+      "size_bytes": 567
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/baseline_25_iterations/run_metadata.json",
+      "extension": ".json",
+      "size_bytes": 2543,
+      "sha256": "040e11d07788daf9da6d6dca73bc20a2ad0f3e656336ffedcc3561b3a1aaec7d"
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/baseline_25_iterations/test_residual_scores.csv",
+      "extension": ".csv",
+      "size_bytes": 86271931
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/baseline_25_iterations/validation_residual_scores.csv",
+      "extension": ".csv",
+      "size_bytes": 15047768
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/channel_separation_summary.csv",
+      "extension": ".csv",
+      "size_bytes": 569
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/run_metadata.json",
+      "extension": ".json",
+      "size_bytes": 2765,
+      "sha256": "ed17b70ff6e70f336e8aeca964f0b7e3465e23afa7e05331511f348ca86591d3"
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/test_residual_scores.csv",
+      "extension": ".csv",
+      "size_bytes": 86823539
+    },
+    {
+      "path": "reports/feature_residual_diagnostic/validation_residual_scores.csv",
+      "extension": ".csv",
+      "size_bytes": 15116009
+    },
+    {
+      "path": "reports/model_comparison/anomaly_type_diagnostics.csv",
+      "extension": ".csv",
+      "size_bytes": 4168
+    },
+    {
+      "path": "reports/model_comparison/dense_ae_type_score_separation.csv",
+      "extension": ".csv",
+      "size_bytes": 519
+    },
+    {
+      "path": "reports/model_comparison/false_positive_burden.csv",
+      "extension": ".csv",
+      "size_bytes": 1581
+    },
+    {
+      "path": "reports/model_comparison/feature_deviation_by_anomaly_type.csv",
+      "extension": ".csv",
+      "size_bytes": 3752
+    },
+    {
+      "path": "reports/model_comparison/missed_abrupt_power_drop_rows.csv",
+      "extension": ".csv",
+      "size_bytes": 1532
+    },
+    {
+      "path": "reports/model_comparison/model_comparison.csv",
+      "extension": ".csv",
+      "size_bytes": 2202
+    },
+    {
+      "path": "reports/model_comparison/model_comparison.json",
+      "extension": ".json",
+      "size_bytes": 5136,
+      "sha256": "50170a753811ae0ab50fc174e527a401559f0fe8132e337f7d63f49b296c51fe"
+    },
+    {
+      "path": "reports/model_comparison/row_scores_test.csv",
+      "extension": ".csv",
+      "size_bytes": 160735173
+    },
+    {
+      "path": "reports/model_comparison/row_scores_validation.csv",
+      "extension": ".csv",
+      "size_bytes": 160725930
+    },
+    {
+      "path": "reports/model_comparison/run_metadata.json",
+      "extension": ".json",
+      "size_bytes": 7610,
+      "sha256": "96fa019c860342ff822c18f43a18e8308080bf9500edf9931534b04b11dd29a7"
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/anomaly_type_diagnostics.csv",
+      "extension": ".csv",
+      "size_bytes": 5246
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/false_positive_burden.csv",
+      "extension": ".csv",
+      "size_bytes": 1453
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/model_comparison.csv",
+      "extension": ".csv",
+      "size_bytes": 8659
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/model_comparison.json",
+      "extension": ".json",
+      "size_bytes": 15718,
+      "sha256": "a7144ebcd19be186fe12cfa0c407729fd99df6a9ae96e3f4ce9eb354030e8c86"
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/row_scores_test.csv",
+      "extension": ".csv",
+      "size_bytes": 186761762
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/row_scores_validation.csv",
+      "extension": ".csv",
+      "size_bytes": 164342717
+    },
+    {
+      "path": "reports/model_comparison_v3_run_001/run_metadata.json",
+      "extension": ".json",
+      "size_bytes": 20472,
+      "sha256": "3981eba9c4671857960ba35cac12ded3a71c37603ec7eca990776144b7afca35"
+    },
+    {
+      "path": "reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/model_comparison.csv",
+      "extension": ".csv",
+      "size_bytes": 1795
+    },
+    {
+      "path": "reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/model_comparison.json",
+      "extension": ".json",
+      "size_bytes": 3916,
+      "sha256": "90bec9daee246904aacad44b9db0f8c0c078f6f655ddafe7ff363fab3f20b8b4"
+    },
+    {
+      "path": "reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/row_scores_test.csv",
+      "extension": ".csv",
+      "size_bytes": 121242077
+    },
+    {
+      "path": "reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/row_scores_validation.csv",
+      "extension": ".csv",
+      "size_bytes": 121215307
+    },
+    {
+      "path": "reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/run_metadata.json",
+      "extension": ".json",
+      "size_bytes": 6026,
+      "sha256": "6cd809a5f4543bed7557a64978d9267d1fb9f8f23a561f331b62c3be3a834a11"
+    },
+    {
+      "path": "reports/pre_supervised_benchmark_backup_20261021_225935/models/preprocessing.json",
+      "extension": ".json",
+      "size_bytes": 3042,
+      "sha256": "8c9be3fcb6f8a543675ca7a61300a18099385eb1a65c8c374dca2be372ffac75"
+    },
+    {
+      "path": "scripts/audit_supervised_data.py",
+      "extension": ".py",
+      "size_bytes": 1869,
+      "sha256": "30ebbc1443dd07a8e67bec017363d560da2f9e5d420828ea3889b58090fb8bb5"
+    },
+    {
+      "path": "scripts/project_inventory.py",
+      "extension": ".py",
+      "size_bytes": 4941,
+      "sha256": "bd54ee8a5ed5dc4ca042a41ba117755c351f896717f81b7d8b956bc1fc64c122"
+    },
+    {
+      "path": "scripts/sentinel_feature_ablation.py",
+      "extension": ".py",
+      "size_bytes": 10426,
+      "sha256": "27924fd4258dcbb1392a427b4bfdd449d8682bdd08b6dd6860820c284eb2a938"
+    },
+    {
+      "path": "scripts/sentinel_feature_diagnostics.py",
+      "extension": ".py",
+      "size_bytes": 5458,
+      "sha256": "05a8fc914a666ef3470232fdd2d4fcaeab3062b3b33c8a301ab93390777b5a19"
+    },
+    {
+      "path": "scripts/sentinel_model_comparison.before_supervised.bak",
+      "extension": ".bak",
+      "size_bytes": 24738
+    },
+    {
+      "path": "scripts/sentinel_model_comparison.py",
+      "extension": ".py",
+      "size_bytes": 27733,
+      "sha256": "7c4aa8f8caeeca440c090b71ae709f83920e57fae4e419a9a1a1f6cb6ae07bad"
+    },
+    {
+      "path": "scripts/sentinel_model_comparison_v3.before_full_replacement.bak",
+      "extension": ".bak",
+      "size_bytes": 33836
+    },
+    {
+      "path": "scripts/sentinel_model_comparison_v3.prebaseline.bak",
+      "extension": ".bak",
+      "size_bytes": 30408
+    },
+    {
+      "path": "scripts/sentinel_model_comparison_v3.prepatch.bak",
+      "extension": ".bak",
+      "size_bytes": 27733
+    },
+    {
+      "path": "scripts/sentinel_model_comparison_v3.py",
+      "extension": ".py",
+      "size_bytes": 35781,
+      "sha256": "817cec309258e8c7e242db7adf5caf3e5b278e0be52d10573c36f46a230189a6"
+    },
+    {
+      "path": "scripts/sentinel_residual_diagnostic.py",
+      "extension": ".py",
+      "size_bytes": 8136,
+      "sha256": "1dba8ebafc2f3d105960fd42171007c3e50fe8507baaa4786e034ec9307c652e"
+    },
+    {
+      "path": "scripts/sentinel_xgboost_v3.py",
+      "extension": ".py",
+      "size_bytes": 14572,
+      "sha256": "a55a6f189be16f0b3458f8f046646201fb63c25430166d8903a81b89e0e45513"
+    },
+    {
+      "path": "src/sentinel/generate_synthetic.py",
+      "extension": ".py",
+      "size_bytes": 12428,
+      "sha256": "81de788a9d92ffd42f4016db4dfc2c7ae5e41d1006f1ffb7e0ccd097115119a8"
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/README.md",
+      "extension": ".md",
+      "size_bytes": 861
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py",
+      "extension": ".py",
+      "size_bytes": 26633,
+      "sha256": "2938b9aaa36cb8f2a1fd05bdba0e34db8a3f0d890d56a50ed8e28f78fd0596b2"
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py.bak",
+      "extension": ".bak",
+      "size_bytes": 24678
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py.metrics_backup",
+      "extension": ".metrics_backup",
+      "size_bytes": 24990
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py.precision_backup",
+      "extension": ".precision_backup",
+      "size_bytes": 24824
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic_v3.py",
+      "extension": ".py",
+      "size_bytes": 26633,
+      "sha256": "2938b9aaa36cb8f2a1fd05bdba0e34db8a3f0d890d56a50ed8e28f78fd0596b2"
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic_v3.py.bak_20261022_172008",
+      "extension": ".bak_20261022_172008",
+      "size_bytes": 26633
+    },
+    {
+      "path": "src/sentinel_generator_package/sentinel_generator_package/tests/test_generate_synthetic.py",
+      "extension": ".py",
+      "size_bytes": 5968,
+      "sha256": "a0c847410670d488a9ee410fae5048ee7b492caca82aafe1d4c880f6efac7474"
+    },
+    {
+      "path": "src/sentinel_generator_package_v3/generate_synthetic_v3.py",
+      "extension": ".py",
+      "size_bytes": 86418,
+      "sha256": "1b2935b1c0a05c20595a05139bc48263d1fd96d5d452506291af11b627c8aaa3"
+    },
+    {
+      "path": "src/sentinel_generator_package_v3/test_generate_synthetic_v3.py",
+      "extension": ".py",
+      "size_bytes": 33464,
+      "sha256": "9da909cebc3e57368cc1fb5d061f24a9cdb6eda4e09e5fb4f3f07b692f268f57"
+    },
+    {
+      "path": "synthetic_output_v1/feature_manifest.json",
+      "extension": ".json",
+      "size_bytes": 1013,
+      "sha256": "328c8f68ffd53202f4dc3a120769eae629e663bb87a98ef44347701bfb5dfe4e"
+    },
+    {
+      "path": "synthetic_output_v1/synthetic_events.csv",
+      "extension": ".csv",
+      "size_bytes": 1365
+    },
+    {
+      "path": "synthetic_output_v1/synthetic_report.json",
+      "extension": ".json",
+      "size_bytes": 9532,
+      "sha256": "790d005c94ef09f261e0bd9a2eba0c8c3112d4e7bf977eabb492dce4a40c5b45"
+    },
+    {
+      "path": "synthetic_output_v1/synthetic_report.txt",
+      "extension": ".txt",
+      "size_bytes": 1484
+    },
+    {
+      "path": "synthetic_output_v1/synthetic_test.parquet",
+      "extension": ".parquet",
+      "size_bytes": 6927577
+    },
+    {
+      "path": "synthetic_output_v1/synthetic_train.parquet",
+      "extension": ".parquet",
+      "size_bytes": 20726294
+    },
+    {
+      "path": "synthetic_output_v1/synthetic_val.parquet",
+      "extension": ".parquet",
+      "size_bytes": 7079638
+    },
+    {
+      "path": "synthetic_output_v2/feature_manifest.json",
+      "extension": ".json",
+      "size_bytes": 1013,
+      "sha256": "328c8f68ffd53202f4dc3a120769eae629e663bb87a98ef44347701bfb5dfe4e"
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_events.csv",
+      "extension": ".csv",
+      "size_bytes": 1548
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_report.json",
+      "extension": ".json",
+      "size_bytes": 9667,
+      "sha256": "5dd5f5972b18acfdd7fa4d8bdc356959338d43945693059c6e769da06a04f361"
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_report.txt",
+      "extension": ".txt",
+      "size_bytes": 1484
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_supervised_train.parquet",
+      "extension": ".parquet",
+      "size_bytes": 21350561
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_supervised_train_events.csv",
+      "extension": ".csv",
+      "size_bytes": 7835
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_test.parquet",
+      "extension": ".parquet",
+      "size_bytes": 6927577
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_train.parquet",
+      "extension": ".parquet",
+      "size_bytes": 20726294
+    },
+    {
+      "path": "synthetic_output_v2/synthetic_val.parquet",
+      "extension": ".parquet",
+      "size_bytes": 7079638
+    }
+  ],
+  "errors": [],
+  "excluded_directory_names": [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "venv"
+  ]
+}

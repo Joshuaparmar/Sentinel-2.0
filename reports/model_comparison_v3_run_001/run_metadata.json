@@ -1,0 +1,659 @@
+{
+  "experiment": "SENTINEL V3 model comparison",
+  "seed": 42,
+  "features": [
+    "gpu0_core_temp",
+    "gpu0_mem_temp",
+    "gpu1_core_temp",
+    "gpu1_mem_temp",
+    "gpu2_core_temp",
+    "gpu2_mem_temp",
+    "gpu3_core_temp",
+    "gpu3_mem_temp",
+    "gpu4_core_temp",
+    "gpu4_mem_temp",
+    "gpu5_core_temp",
+    "gpu5_mem_temp",
+    "p0_gpu0_power",
+    "p0_gpu1_power",
+    "p0_gpu2_power",
+    "p0_power",
+    "p0_temp_max",
+    "p0_temp_mean",
+    "p0_temp_min",
+    "p1_gpu0_power",
+    "p1_gpu1_power",
+    "p1_gpu2_power",
+    "p1_power",
+    "p1_temp_max",
+    "p1_temp_mean",
+    "p1_temp_min",
+    "ps0_input_power",
+    "ps1_input_power"
+  ],
+  "sequence_length": 30,
+  "threshold_protocol": "New models: normal-validation order statistic targeting at most 1% FPR. Frozen XGBoost baseline reuses its original validation-selected threshold.",
+  "target_validation_fpr": 0.01,
+  "train_rows": 518400,
+  "supervised_train_rows": 518400,
+  "validation_rows": 169800,
+  "test_rows": 169800,
+  "train_anomalies": 0,
+  "supervised_train_anomalies": 6902,
+  "validation_anomalies": 692,
+  "test_anomalies": 696,
+  "test_event_count": 30,
+  "models": [
+    {
+      "model": "Isolation Forest",
+      "score_unit": "all test rows",
+      "threshold": 0.5498897237496028,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.099002849002849,
+      "recall": 0.1997126436781609,
+      "f1": 0.13238095238095238,
+      "pr_auc_average_precision": 0.157356159345071,
+      "roc_auc": 0.922463599221536,
+      "false_positive_rate": 0.007480603652190368,
+      "true_positives": 139,
+      "false_positives": 1265,
+      "false_negatives": 557,
+      "true_negatives": 167839,
+      "test_events": 30,
+      "events_detected": 9,
+      "event_detection_rate": 0.3,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 1,
+          "detection_rate": 0.16666666666666666
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 0,
+          "detection_rate": 0.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 3,
+          "detection_rate": 0.5
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 4,
+          "detection_rate": 0.6666666666666666
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 1,
+          "detection_rate": 0.16666666666666666
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 3,
+          "detection_rate": 0.2
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 6,
+          "detection_rate": 0.4
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "PCA Reconstruction",
+      "score_unit": "all test rows",
+      "threshold": 0.011083995923399925,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.009991673605328892,
+      "recall": 0.017241379310344827,
+      "f1": 0.012651555086979441,
+      "pr_auc_average_precision": 0.009810550842745418,
+      "roc_auc": 0.715972539988994,
+      "false_positive_rate": 0.007031176080991579,
+      "true_positives": 12,
+      "false_positives": 1189,
+      "false_negatives": 684,
+      "true_negatives": 167915,
+      "test_events": 30,
+      "events_detected": 3,
+      "event_detection_rate": 0.1,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 0,
+          "detection_rate": 0.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 0,
+          "detection_rate": 0.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 2,
+          "detection_rate": 0.3333333333333333
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 0,
+          "detection_rate": 0.0
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 1,
+          "detection_rate": 0.16666666666666666
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 1,
+          "detection_rate": 0.06666666666666667
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 2,
+          "detection_rate": 0.13333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "Gaussian Mixture Model",
+      "score_unit": "all test rows",
+      "threshold": 53.70067596435547,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.10003390979993218,
+      "recall": 0.4238505747126437,
+      "f1": 0.16186556927297668,
+      "pr_auc_average_precision": 0.06348145854842376,
+      "roc_auc": 0.8985817865058624,
+      "false_positive_rate": 0.015694483867915603,
+      "true_positives": 295,
+      "false_positives": 2654,
+      "false_negatives": 401,
+      "true_negatives": 166450,
+      "test_events": 30,
+      "events_detected": 22,
+      "event_detection_rate": 0.7333333333333333,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 3,
+          "detection_rate": 0.5
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 3,
+          "detection_rate": 0.5
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 8,
+          "detection_rate": 0.5333333333333333
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 14,
+          "detection_rate": 0.9333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "LightGBM",
+      "score_unit": "all test rows",
+      "threshold": 0.11086465476362171,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.24554383412149872,
+      "recall": 0.9698275862068966,
+      "f1": 0.3918722786647315,
+      "pr_auc_average_precision": 0.9547476151230879,
+      "roc_auc": 0.9935022047916102,
+      "false_positive_rate": 0.012264641877188003,
+      "true_positives": 675,
+      "false_positives": 2074,
+      "false_negatives": 21,
+      "true_negatives": 167030,
+      "test_events": 30,
+      "events_detected": 29,
+      "event_detection_rate": 0.9666666666666667,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 15,
+          "detection_rate": 1.0
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 14,
+          "detection_rate": 0.9333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "XGBoost Comparison Run",
+      "score_unit": "all test rows",
+      "threshold": 0.13980475068092346,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.36790393013100436,
+      "recall": 0.9683908045977011,
+      "f1": 0.5332278481012658,
+      "pr_auc_average_precision": 0.9611585355467517,
+      "roc_auc": 0.9919968781708705,
+      "false_positive_rate": 0.0068478569401078625,
+      "true_positives": 674,
+      "false_positives": 1158,
+      "false_negatives": 22,
+      "true_negatives": 167946,
+      "test_events": 30,
+      "events_detected": 29,
+      "event_detection_rate": 0.9666666666666667,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 15,
+          "detection_rate": 1.0
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 14,
+          "detection_rate": 0.9333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "Dense Autoencoder",
+      "score_unit": "all test rows",
+      "threshold": 0.0365607813000679,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.27742749054224464,
+      "recall": 0.632183908045977,
+      "f1": 0.38562664329535495,
+      "pr_auc_average_precision": 0.300889670484103,
+      "roc_auc": 0.9057791571574536,
+      "false_positive_rate": 0.006776894692023843,
+      "true_positives": 440,
+      "false_positives": 1146,
+      "false_negatives": 256,
+      "true_negatives": 167958,
+      "test_events": 30,
+      "events_detected": 28,
+      "event_detection_rate": 0.9333333333333333,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 14,
+          "detection_rate": 0.9333333333333333
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 14,
+          "detection_rate": 0.9333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "1D-CNN Autoencoder",
+      "score_unit": "sequence endpoint rows",
+      "threshold": 0.26591765880584717,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 166900,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.12170308967596082,
+      "recall": 0.4640804597701149,
+      "f1": 0.1928358208955224,
+      "pr_auc_average_precision": 0.09912337539730193,
+      "roc_auc": 0.9024443449844354,
+      "false_positive_rate": 0.01402493321460374,
+      "true_positives": 323,
+      "false_positives": 2331,
+      "false_negatives": 373,
+      "true_negatives": 163873,
+      "test_events": 30,
+      "events_detected": 21,
+      "event_detection_rate": 0.7,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 2,
+          "detection_rate": 0.3333333333333333
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 2,
+          "detection_rate": 0.3333333333333333
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 9,
+          "detection_rate": 0.6
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 12,
+          "detection_rate": 0.8
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "LSTM Autoencoder",
+      "score_unit": "sequence endpoint rows",
+      "threshold": 0.7785224318504333,
+      "threshold_source": "normal_validation_order_statistic_target_1pct_fpr",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 166900,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.0933028048082427,
+      "recall": 0.23419540229885058,
+      "f1": 0.13344248874334835,
+      "pr_auc_average_precision": 0.06598937007386464,
+      "roc_auc": 0.9004008619306505,
+      "false_positive_rate": 0.009530456547375514,
+      "true_positives": 163,
+      "false_positives": 1584,
+      "false_negatives": 533,
+      "true_negatives": 164620,
+      "test_events": 30,
+      "events_detected": 16,
+      "event_detection_rate": 0.5333333333333333,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 0,
+          "detection_rate": 0.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 4,
+          "detection_rate": 0.6666666666666666
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 2,
+          "detection_rate": 0.3333333333333333
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 5,
+          "detection_rate": 0.3333333333333333
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 11,
+          "detection_rate": 0.7333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": NaN,
+      "baseline_note": NaN
+    },
+    {
+      "model": "XGBoost V3 Frozen Baseline",
+      "score_unit": "all test rows",
+      "threshold": 0.14345329999923706,
+      "threshold_source": "saved_original_validation_selected_threshold",
+      "target_validation_fpr": 0.01,
+      "threshold_quantile": null,
+      "n_scored": 169800,
+      "coverage_fraction": 1.0,
+      "unscored_rows": 0,
+      "test_anomalies": 696,
+      "precision": 0.3667574931880109,
+      "recall": 0.9669540229885057,
+      "f1": 0.5318056104306598,
+      "pr_auc_average_precision": 0.959328261921317,
+      "roc_auc": 0.9910392489203407,
+      "false_positive_rate": 0.006871511022802535,
+      "true_positives": 673,
+      "false_positives": 1162,
+      "false_negatives": 23,
+      "true_negatives": 167942,
+      "test_events": 30,
+      "events_detected": 29,
+      "event_detection_rate": 0.9666666666666667,
+      "event_detection_by_type": {
+        "abrupt_power_drop": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "gradual_degradation": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "multi_host_event": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "thermal_anomaly": {
+          "events": 6,
+          "detected": 6,
+          "detection_rate": 1.0
+        },
+        "transient_spike": {
+          "events": 6,
+          "detected": 5,
+          "detection_rate": 0.8333333333333334
+        }
+      },
+      "event_detection_by_severity": {
+        "baseline": {
+          "events": 15,
+          "detected": 15,
+          "detection_rate": 1.0
+        },
+        "held_out": {
+          "events": 15,
+          "detected": 14,
+          "detection_rate": 0.9333333333333333
+        }
+      },
+      "event_detection_note": "Counted by manifest event_id; multi-host events count once.",
+      "baseline_best_iteration": 301.0,
+      "baseline_note": "Separate pre-existing experiment; saved threshold and test scores reused unchanged."
+    }
+  ],
+  "elapsed_seconds": 391.31,
+  "limitations": [
+    "The benchmark evaluates generated synthetic scenarios, not real-world incident performance.",
+    "LightGBM and the comparison-run XGBoost train on injected synthetic anomalies; real-world generalization is unverified.",
+    "The frozen XGBoost baseline is a separately trained experiment with its own saved validation-selected threshold.",
+    "Temporal models score sequence endpoints only; early rows per host are not scored.",
+    "False-positive burden is an approximate row-based rate, not a deduplicated alert-incident count."
+  ]
+}

@@ -1,0 +1,213 @@
+{
+  "overall": "PASS",
+  "checks": [
+    {
+      "id": "C01",
+      "name": "source_audit",
+      "status": "PASS",
+      "details": "complete panel, regular interval, normal-only labels, finite uniform-dtype features; 0 pre-existing temperature-summary violations recorded",
+      "measured": {
+        "rows": 864000,
+        "hosts": 100,
+        "timestamps": 8640,
+        "complete_panel": true,
+        "duplicate_host_time_rows": 0,
+        "source_label_nonzero": 0,
+        "interval_seconds_top_counts": {
+          "10": 8639
+        },
+        "irregular_intervals": 0,
+        "feature_dtype": "float32",
+        "feature_count": 28,
+        "power_features": 10,
+        "temperature_features": 18,
+        "preexisting_summary_violations": 0,
+        "time_start": "2020-01-01 00:00:00",
+        "time_end": "2020-01-01 23:59:50"
+      }
+    },
+    {
+      "id": "C02",
+      "name": "source_file_unchanged",
+      "status": "PASS",
+      "details": "SHA-256 identical before and after",
+      "measured": {
+        "sha256": "93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7"
+      }
+    },
+    {
+      "id": "C03",
+      "name": "split_boundaries_and_purge",
+      "status": "PASS",
+      "details": "3 chronological partitions, 30-timestamp purge gaps, no shared rows or timestamps",
+      "measured": {
+        "steps": {
+          "supervised_train": 5184,
+          "validation": 1698,
+          "test": 1698
+        },
+        "purged_rows": 6000
+      }
+    },
+    {
+      "id": "C04",
+      "name": "host_pool_separation",
+      "status": "PASS",
+      "details": "anomaly hosts are disjoint across supervised_train / validation / test (every host still appears as normal data in every partition)",
+      "measured": {
+        "pool_sizes": {
+          "supervised_train": 34,
+          "validation": 33,
+          "test": 33
+        },
+        "hosts_used": {
+          "supervised_train": 34,
+          "validation": 33,
+          "test": 33
+        }
+      }
+    },
+    {
+      "id": "C05",
+      "name": "normal_train_preserved",
+      "status": "PASS",
+      "details": "518,400 rows, all labels 0, every source column identical to the source rows",
+      "measured": {}
+    },
+    {
+      "id": "C06",
+      "name": "supervised_copy_integrity",
+      "status": "PASS",
+      "details": "same 518,400 rows/order as normal train; only the 6,902 labelled rows differ",
+      "measured": {}
+    },
+    {
+      "id": "C07",
+      "name": "label_consistency",
+      "status": "PASS",
+      "details": "label, anomaly_type and event_id agree in all three labelled datasets",
+      "measured": {
+        "supervised_train": 6902,
+        "validation": 692,
+        "test": 696
+      }
+    },
+    {
+      "id": "C08",
+      "name": "event_manifest_matches_data",
+      "status": "PASS",
+      "details": "360 events: labelled rows equal hosts x window for every event",
+      "measured": {
+        "events": 360
+      }
+    },
+    {
+      "id": "C09",
+      "name": "event_parameters_and_placement",
+      "status": "PASS",
+      "details": "counts, durations, host counts, band ranges, edge margins and overlap/guard rules all respected",
+      "measured": {
+        "policies": {
+          "supervised_train": "per_host",
+          "validation": "global",
+          "test": "global"
+        }
+      }
+    },
+    {
+      "id": "C10",
+      "name": "realized_effects",
+      "status": "PASS",
+      "details": "every event re-measured on the final frames: correct direction/magnitude, unrelated features and unlabelled rows unchanged, every labelled row changed, manifest values match",
+      "measured": {}
+    },
+    {
+      "id": "C11",
+      "name": "schema_dtype_finite",
+      "status": "PASS",
+      "details": "identical columns/dtypes in all 4 datasets; 28 finite float32 features",
+      "measured": {}
+    },
+    {
+      "id": "C12",
+      "name": "temperature_summary_no_new_violations",
+      "status": "PASS",
+      "details": "no new min<=mean<=max violations (pre-existing source violations are recorded, not altered)",
+      "measured": {
+        "train": {
+          "violations": 0,
+          "in_source_rows": 0
+        },
+        "supervised_train": {
+          "violations": 0,
+          "in_source_rows": 0
+        },
+        "validation": {
+          "violations": 0,
+          "in_source_rows": 0
+        },
+        "test": {
+          "violations": 0,
+          "in_source_rows": 0
+        }
+      }
+    },
+    {
+      "id": "C13",
+      "name": "held_out_separation",
+      "status": "PASS",
+      "details": "held-out events appear only in test; no other event has parameters inside a held-out range",
+      "measured": {
+        "held_out_events": 15,
+        "held_out_rows": 349
+      }
+    },
+    {
+      "id": "C14",
+      "name": "plan_reproducibility",
+      "status": "PASS",
+      "details": "event plan re-derived from the seed is identical (full-content determinism is covered by the test suite)",
+      "measured": {}
+    },
+    {
+      "id": "C15",
+      "name": "capacity_feasibility",
+      "status": "PASS",
+      "details": "all configured events were placed without shortening or dropping",
+      "measured": {
+        "supervised_train": {
+          "usable_steps": 5124,
+          "events": 300,
+          "event_steps": 4832,
+          "pool_hosts": 34
+        },
+        "validation": {
+          "usable_steps": 1638,
+          "events": 30,
+          "event_steps": 485,
+          "pool_hosts": 33
+        },
+        "test": {
+          "usable_steps": 1638,
+          "events": 30,
+          "event_steps": 486,
+          "pool_hosts": 33
+        }
+      }
+    },
+    {
+      "id": "C16",
+      "name": "protected_files_unchanged",
+      "status": "PASS",
+      "details": "4 protected path(s) unchanged",
+      "measured": {}
+    },
+    {
+      "id": "C17",
+      "name": "artifacts_readback",
+      "status": "PASS",
+      "details": "parquet files and event manifests re-read identical to memory",
+      "measured": {}
+    }
+  ]
+}

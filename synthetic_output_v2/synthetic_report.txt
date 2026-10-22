@@ -1,0 +1,24 @@
+SENTINEL 2.0 SYNTHETIC DATASET REPORT
+================================================
+Seed: 42
+Source: C:\Users\Shirley\joshua\CRCE\CAPSTONE\Sentinel\dataset\ClusterWise_mini\olcf_task\train.parquet
+Source SHA-256 before: 93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7
+Source SHA-256 after : 93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7
+Source unchanged: True
+Purged rows: 1000
+Model features (28): gpu0_core_temp, gpu0_mem_temp, gpu1_core_temp, gpu1_mem_temp, gpu2_core_temp, gpu2_mem_temp, gpu3_core_temp, gpu3_mem_temp, gpu4_core_temp, gpu4_mem_temp, gpu5_core_temp, gpu5_mem_temp, p0_gpu0_power, p0_gpu1_power, p0_gpu2_power, p0_power, p0_temp_max, p0_temp_mean, p0_temp_min, p1_gpu0_power, p1_gpu1_power, p1_gpu2_power, p1_power, p1_temp_max, p1_temp_mean, p1_temp_min, ps0_input_power, ps1_input_power
+
+TRAIN: 518400 rows, 100 hosts
+Labels: {0: 518400}
+Anomaly types: {'normal': 518400}
+
+VALIDATION: 172300 rows, 100 hosts
+Labels: {0: 172177, 1: 123}
+Anomaly types: {'normal': 172177, 'multi_host_event': 48, 'gradual_degradation': 32, 'thermal_anomaly': 24, 'abrupt_power_drop': 16, 'transient_spike': 3}
+
+TEST: 172300 rows, 100 hosts
+Labels: {0: 172195, 1: 105}
+Anomaly types: {'normal': 172195, 'multi_host_event': 44, 'gradual_degradation': 24, 'thermal_anomaly': 18, 'abrupt_power_drop': 16, 'transient_spike': 3}
+
+Events: 10
+Note: sensor envelopes are training-derived and are not engineering specifications.

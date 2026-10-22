@@ -1,0 +1,10 @@
+model,scored_rows,scored_normal_rows,false_positive_rows,false_positives_per_100_host_hours,note
+Isolation Forest,169800,169104,1265,269.30173147885324,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+PCA Reconstruction,169800,169104,1189,253.12233891569682,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+Gaussian Mixture Model,169800,169104,2654,565.0014192449617,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+LightGBM,169800,169104,2074,441.5271075787681,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+XGBoost Comparison Run,169800,169104,1158,246.52284984388305,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+Dense Autoencoder,169800,169104,1146,243.96820891285836,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+1D-CNN Autoencoder,166900,166204,2331,504.89759572573456,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+LSTM Autoencoder,166900,166204,1584,343.0964357055185,"Approximate false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+XGBoost V3 Frozen Baseline,169800,169104,1162,247.3743968208913,Frozen baseline; approximate false-positive rows per 100 normal host-hours.

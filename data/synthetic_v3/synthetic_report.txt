@@ -1,0 +1,135 @@
+SENTINEL 2.0 V3 synthetic dataset report
+============================================================
+Generator version: 3.0.0  |  seed: 42
+Scope: Generator validation only. Not a model evaluation; not evidence of real-world realism.
+
+Source: C:\Users\Shirley\joshua\CRCE\CAPSTONE\Sentinel\dataset\ClusterWise_mini\olcf_task\train.parquet
+  SHA-256 before: 93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7
+  SHA-256 after : 93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7
+  unchanged: True
+  rows 864,000 | hosts 100 | timestamps 8,640 | interval 10 s
+  pre-existing temperature-summary violations: 0
+
+Split boundaries (purge 30 timestamps each; purged rows 6,000):
+  train_start: 2020-01-01 00:00:00
+  train_end: 2020-01-01 14:23:50
+  validation_start: 2020-01-01 14:29:00
+  validation_end: 2020-01-01 19:11:50
+  test_start: 2020-01-01 19:17:00
+  test_end: 2020-01-01 23:59:50
+
+Features: 28 (float32) - 10 power, 18 temperature
+
+Datasets:
+  train: 518,400 rows, labels {'0': 518400}, types {'normal': 518400}
+  supervised_train: 518,400 rows, labels {'0': 511498, '1': 6902}, types {'normal': 511498, 'multi_host_event': 2760, 'gradual_degradation': 1800, 'thermal_anomaly': 1263, 'abrupt_power_drop': 899, 'transient_spike': 180}
+  validation: 169,800 rows, labels {'0': 169108, '1': 692}, types {'normal': 169108, 'multi_host_event': 276, 'gradual_degradation': 182, 'thermal_anomaly': 127, 'abrupt_power_drop': 89, 'transient_spike': 18}
+  test: 169,800 rows, labels {'0': 169104, '1': 696}, types {'normal': 169104, 'multi_host_event': 280, 'gradual_degradation': 180, 'thermal_anomaly': 126, 'abrupt_power_drop': 92, 'transient_spike': 18}
+
+Anomaly-host pools: supervised_train=34, validation=33, test=33
+
+Event counts (split / scenario / band):
+  supervised_train  abrupt_power_drop    {'baseline': 60}
+  supervised_train  gradual_degradation  {'baseline': 60}
+  supervised_train  multi_host_event     {'baseline': 60}
+  supervised_train  thermal_anomaly      {'baseline': 60}
+  supervised_train  transient_spike      {'baseline': 60}
+  test              abrupt_power_drop    {'baseline': 3, 'held_out': 3}
+  test              gradual_degradation  {'baseline': 3, 'held_out': 3}
+  test              multi_host_event     {'baseline': 3, 'held_out': 3}
+  test              thermal_anomaly      {'baseline': 3, 'held_out': 3}
+  test              transient_spike      {'baseline': 3, 'held_out': 3}
+  validation        abrupt_power_drop    {'baseline': 6}
+  validation        gradual_degradation  {'baseline': 6}
+  validation        multi_host_event     {'baseline': 6}
+  validation        thermal_anomaly      {'baseline': 6}
+  validation        transient_spike      {'baseline': 6}
+
+Realized effects (target vs realized, by scenario and band):
+  abrupt_power_drop / baseline: events=69 rows=1034
+      target_power_multiplier: min 0.3502, median 0.4256, max 0.499
+      realized_power_multiplier: min 0.3502, median 0.4256, max 0.499
+      envelope_exceed_fraction: min 0, median 0, max 0
+      duration_steps: min 12, median 15, max 18
+  abrupt_power_drop / held_out: events=3 rows=46
+      target_power_multiplier: min 0.2273, median 0.2448, max 0.2745
+      realized_power_multiplier: min 0.2273, median 0.2448, max 0.2745
+      envelope_exceed_fraction: min 0, median 0, max 0
+      duration_steps: min 14, median 14, max 18
+  gradual_degradation / baseline: events=69 rows=2072
+      target_final_power_factor: min 0.4526, median 0.5515, max 0.6498
+      realized_final_power_factor: min 0.4526, median 0.5515, max 0.6498
+      envelope_exceed_fraction: min 0, median 0, max 0
+      duration_steps: min 24, median 30, max 36
+  gradual_degradation / held_out: events=3 rows=90
+      target_final_power_factor: min 0.2771, median 0.3424, max 0.3729
+      realized_final_power_factor: min 0.2771, median 0.3424, max 0.3729
+      envelope_exceed_fraction: min 0, median 0, max 0
+      duration_steps: min 28, median 29, max 33
+  multi_host_event / baseline: events=69 rows=3176
+      target_power_multiplier: min 0.6004, median 0.6757, max 0.7498
+      realized_power_multiplier: min 0.6004, median 0.6757, max 0.7498
+      target_temp_offset: min 2, median 2, max 2
+      realized_temp_offset: min 2, median 2, max 2
+      envelope_exceed_fraction: min 0, median 0, max 0.01488
+      duration_steps: min 9, median 12, max 14
+  multi_host_event / held_out: events=3 rows=140
+      target_power_multiplier: min 0.4332, median 0.4772, max 0.5447
+      realized_power_multiplier: min 0.4332, median 0.4772, max 0.5447
+      target_temp_offset: min 3.145, median 3.78, max 4.392
+      realized_temp_offset: min 3.145, median 3.78, max 4.392
+      envelope_exceed_fraction: min 0, median 0, max 0
+      duration_steps: min 9, median 12, max 14
+  thermal_anomaly / baseline: events=69 rows=1452
+      target_temp_offset: min 5.044, median 6.55, max 7.972
+      realized_temp_offset: min 5.044, median 6.55, max 7.972
+      envelope_exceed_fraction: min 0, median 0, max 0.5556
+      duration_steps: min 18, median 21, max 24
+  thermal_anomaly / held_out: events=3 rows=64
+      target_temp_offset: min 9.524, median 10.16, max 11.26
+      realized_temp_offset: min 9.524, median 10.16, max 11.26
+      envelope_exceed_fraction: min 0, median 0.03175, max 0.3977
+      duration_steps: min 19, median 21, max 24
+  transient_spike / baseline: events=69 rows=207
+      target_power_multiplier: min 1.351, median 1.505, max 1.649
+      realized_power_multiplier: min 1.351, median 1.505, max 1.649
+      envelope_exceed_fraction: min 0, median 0, max 0.8
+      duration_steps: min 2, median 3, max 4
+  transient_spike / held_out: events=3 rows=9
+      target_power_multiplier: min 1.753, median 1.805, max 1.895
+      realized_power_multiplier: min 1.753, median 1.805, max 1.895
+      envelope_exceed_fraction: min 0, median 0.1, max 0.1
+      duration_steps: min 2, median 3, max 4
+
+Validation checks: PASS
+  [PASS          ] C01 source_audit: complete panel, regular interval, normal-only labels, finite uniform-dtype features; 0 pre-existing temperature-summary violations recorded
+  [PASS          ] C02 source_file_unchanged: SHA-256 identical before and after
+  [PASS          ] C03 split_boundaries_and_purge: 3 chronological partitions, 30-timestamp purge gaps, no shared rows or timestamps
+  [PASS          ] C04 host_pool_separation: anomaly hosts are disjoint across supervised_train / validation / test (every host still appears as normal data in every partition)
+  [PASS          ] C05 normal_train_preserved: 518,400 rows, all labels 0, every source column identical to the source rows
+  [PASS          ] C06 supervised_copy_integrity: same 518,400 rows/order as normal train; only the 6,902 labelled rows differ
+  [PASS          ] C07 label_consistency: label, anomaly_type and event_id agree in all three labelled datasets
+  [PASS          ] C08 event_manifest_matches_data: 360 events: labelled rows equal hosts x window for every event
+  [PASS          ] C09 event_parameters_and_placement: counts, durations, host counts, band ranges, edge margins and overlap/guard rules all respected
+  [PASS          ] C10 realized_effects: every event re-measured on the final frames: correct direction/magnitude, unrelated features and unlabelled rows unchanged, every labelled row changed, manifest values match
+  [PASS          ] C11 schema_dtype_finite: identical columns/dtypes in all 4 datasets; 28 finite float32 features
+  [PASS          ] C12 temperature_summary_no_new_violations: no new min<=mean<=max violations (pre-existing source violations are recorded, not altered)
+  [PASS          ] C13 held_out_separation: held-out events appear only in test; no other event has parameters inside a held-out range
+  [PASS          ] C14 plan_reproducibility: event plan re-derived from the seed is identical (full-content determinism is covered by the test suite)
+  [PASS          ] C15 capacity_feasibility: all configured events were placed without shortening or dropping
+  [PASS          ] C16 protected_files_unchanged: 4 protected path(s) unchanged
+  [PASS          ] C17 artifacts_readback: parquet files and event manifests re-read identical to memory
+
+Assumptions:
+  - Baseline severity ranges are the existing generator's configuration, not measured fault statistics.
+  - Held-out severity bands are PROPOSED and not validated; stronger anomalies test extrapolation to more severe faults, not generalization to unseen anomaly categories (and are likely easier to detect).
+  - One multiplier is applied to all power features and one offset to all temperature features (including min/mean/max summaries, which therefore keep their ordering). Real hardware may not behave this way.
+  - Step durations are converted to time with the audited 10 s sampling interval.
+  - Guard and edge margins (30 steps) are configurable design choices, chosen to match the 30-step sequence window.
+  - The training-derived envelope is descriptive; events are never clipped to it.
+
+Limitations:
+  - A passing run certifies data generation only; it does not show that synthetic anomalies resemble real faults.
+  - It does not show model performance, generalization, or that a validation false-positive-rate target is met.
+  - Host separation covers where anomalies are injected; every host appears as normal data in every partition.
+  - Rows inside an event are strongly autocorrelated; evaluate at event level and do not treat rows as independent.

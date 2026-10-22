@@ -1,0 +1,566 @@
+#!/usr/bin/env python
+"""SENTINEL 2.0: eight-model anomaly-detection comparison on synthetic_output_v2.
+
+Trains only on normal training rows/windows, selects thresholds from normal
+validation scores, and evaluates once on the labelled test split.
+"""
+from __future__ import annotations
+
+import json
+import time
+import warnings
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.ensemble import IsolationForest
+from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
+import joblib
+from sklearn.metrics import (
+    average_precision_score,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    f1_score,
+)
+from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPRegressor
+
+warnings.filterwarnings("ignore", category=UserWarning)
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = ROOT / "synthetic_output_v2"
+REPORT_DIR = ROOT / "reports" / "model_comparison"
+MODEL_DIR = ROOT / "models" / "comparison"
+SEED = 42
+THRESHOLD_QUANTILE = 0.99
+MAX_CLASSICAL_TRAIN = 100_000
+MAX_DENSE_TRAIN = 100_000
+MAX_GMM_TRAIN = 30_000
+MAX_SEQUENCE_TRAIN = 25_000
+SEQUENCE_LENGTH = 30  # 5 minutes at 10-second sampling
+BATCH_SIZE = 256
+EPOCHS = 8
+PATIENCE = 2
+DEVICE_NAME = "cuda"  # automatically falls back to CPU if unavailable
+
+
+def load_manifest() -> list[str]:
+    with (DATA_DIR / "feature_manifest.json").open(encoding="utf-8") as f:
+        manifest = json.load(f)
+    features = manifest["features"]
+    if len(features) != 28:
+        raise ValueError(f"Expected 28 manifest features, found {len(features)}")
+    return features
+
+
+def load_split(name: str, features: list[str]) -> pd.DataFrame:
+    df = pd.read_parquet(DATA_DIR / f"synthetic_{name}.parquet")
+    required = set(features) | {"hostname", "timestamp", "label", "anomaly_type"}
+    missing = sorted(required - set(df.columns))
+    if missing:
+        raise ValueError(f"{name} split is missing columns: {missing}")
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df = df.sort_values(["hostname", "timestamp"], kind="stable").reset_index(drop=True)
+    values = df[features].replace([np.inf, -np.inf], np.nan)
+    # No backward fill: fill only from past observations within each host,
+    # then use training-derived medians.
+    df[features] = values.groupby(df["hostname"], sort=False).ffill()
+    return df
+
+
+def sample_indices(n: int, cap: int, rng: np.random.Generator) -> np.ndarray:
+    if n <= cap:
+        return np.arange(n)
+    return np.sort(rng.choice(n, size=cap, replace=False))
+
+
+def point_arrays(df: pd.DataFrame, features: list[str], medians: pd.Series):
+    X = df[features].replace([np.inf, -np.inf], np.nan).fillna(medians).to_numpy(np.float32)
+    y = df["label"].astype(int).to_numpy()
+    return X, y
+
+
+def make_sequences(df: pd.DataFrame, features: list[str], medians: pd.Series,
+                   scaler: StandardScaler, stride: int, max_windows: int | None = None,
+                   normal_only: bool = False, rng: np.random.Generator | None = None):
+    """Build windows within each host, never crossing host boundaries."""
+    seqs, endpoint_labels, endpoint_rows = [], [], []
+    for _, group in df.groupby("hostname", sort=False):
+        group = group.sort_values("timestamp", kind="stable")
+        raw = group[features].replace([np.inf, -np.inf], np.nan).fillna(medians).to_numpy(np.float32)
+        scaled = scaler.transform(raw).astype(np.float32)
+        labels = group["label"].astype(int).to_numpy()
+        global_rows = group.index.to_numpy()
+        if len(group) < SEQUENCE_LENGTH:
+            continue
+        for end in range(SEQUENCE_LENGTH - 1, len(group), stride):
+            if normal_only and labels[end] != 0:
+                continue
+            seqs.append(scaled[end - SEQUENCE_LENGTH + 1:end + 1])
+            endpoint_labels.append(labels[end])
+            endpoint_rows.append(global_rows[end])
+    if not seqs:
+        return (np.empty((0, SEQUENCE_LENGTH, len(features)), dtype=np.float32),
+                np.empty(0, dtype=int), np.empty(0, dtype=int))
+    X = np.asarray(seqs, dtype=np.float32)
+    y = np.asarray(endpoint_labels, dtype=int)
+    rows = np.asarray(endpoint_rows, dtype=int)
+    if max_windows is not None and len(X) > max_windows:
+        if rng is None:
+            rng = np.random.default_rng(SEED)
+        chosen = np.sort(rng.choice(len(X), size=max_windows, replace=False))
+        X, y, rows = X[chosen], y[chosen], rows[chosen]
+    return X, y, rows
+
+
+def score_metrics(y: np.ndarray, scores: np.ndarray, threshold: float) -> dict:
+    valid = np.isfinite(scores)
+    y, scores = y[valid], scores[valid]
+    pred = (scores > threshold).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
+    return {
+        "n_scored": int(len(y)),
+        "test_anomalies": int(y.sum()),
+        "threshold": float(threshold),
+        "precision": float(precision_score(y, pred, zero_division=0)),
+        "recall": float(recall_score(y, pred, zero_division=0)),
+        "f1": float(f1_score(y, pred, zero_division=0)),
+        "pr_auc_average_precision": float(average_precision_score(y, scores)) if y.sum() else float("nan"),
+        "false_positive_rate": float(fp / (fp + tn)) if fp + tn else float("nan"),
+        "true_positives": int(tp),
+        "false_positives": int(fp),
+        "false_negatives": int(fn),
+        "true_negatives": int(tn),
+    }
+
+
+def event_metrics(test_df: pd.DataFrame, scored_rows: np.ndarray,
+                  scores: np.ndarray, threshold: float) -> dict:
+    """Event recall: event is detected if at least one labelled event row is alerted."""
+    scored = pd.DataFrame({"row": scored_rows, "score": scores})
+    score_by_row = dict(zip(scored["row"].tolist(), scored["score"].tolist()))
+    frame = test_df.reset_index(drop=True)
+    event_rows = frame.index[frame["label"].astype(int).to_numpy() == 1].to_numpy()
+    # Use anomaly_type and host to define distinct labelled runs.
+    detected, total = 0, 0
+    for _, group in frame[frame["label"].astype(int) == 1].groupby(["hostname", "anomaly_type"], sort=False):
+        # Separate runs when timestamps are more than 10 seconds apart.
+        group = group.sort_values("timestamp")
+        times = group["timestamp"].tolist()
+        runs, current = [], []
+        for idx, ts in zip(group.index.tolist(), times):
+            if current and (ts - current[-1][1]).total_seconds() > 10.1:
+                runs.append(current)
+                current = []
+            current.append((idx, ts))
+        if current:
+            runs.append(current)
+        for run in runs:
+            total += 1
+            if any((score_by_row.get(idx, -np.inf) > threshold) for idx, _ in run):
+                detected += 1
+    return {
+        "labelled_host_type_runs": int(total),
+        "detected_host_type_runs": int(detected),
+        "event_recall": float(detected / total) if total else float("nan"),
+        "note": "Synthetic labelled host/type runs; event count is small and should be interpreted cautiously.",
+    }
+
+
+def fit_dense_autoencoder(X_train: np.ndarray, X_val: np.ndarray, X_test: np.ndarray):
+    """A compact MLP trained to reconstruct normal rows; uses sklearn for portability."""
+    model = MLPRegressor(
+        hidden_layer_sizes=(64, 16, 64),
+        activation="relu",
+        solver="adam",
+        alpha=1e-4,
+        batch_size=512,
+        learning_rate_init=1e-3,
+        max_iter=25,
+        early_stopping=True,
+        validation_fraction=0.1,
+        n_iter_no_change=3,
+        random_state=SEED,
+        verbose=False,
+    )
+    model.fit(X_train, X_train)
+    def errors(X):
+        pred = model.predict(X)
+        return np.mean(np.square(X - pred), axis=1)
+    return model, errors(X_val), errors(X_test)
+
+
+def get_torch():
+    import torch
+    from torch import nn
+    from torch.utils.data import DataLoader, TensorDataset
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return torch, nn, DataLoader, TensorDataset, device
+
+
+def train_sequence_model(kind: str, train_seq: np.ndarray, val_seq: np.ndarray,
+                         test_seq: np.ndarray):
+    torch, nn, DataLoader, TensorDataset, device = get_torch()
+    torch.manual_seed(SEED)
+    np.random.seed(SEED)
+    n_features = train_seq.shape[-1]
+
+    class ConvAE(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.encoder = nn.Sequential(
+                nn.Conv1d(n_features, 32, kernel_size=3, padding=1), nn.ReLU(),
+                nn.Conv1d(32, 16, kernel_size=3, padding=1), nn.ReLU(),
+            )
+            self.decoder = nn.Sequential(
+                nn.Conv1d(16, 32, kernel_size=3, padding=1), nn.ReLU(),
+                nn.Conv1d(32, n_features, kernel_size=3, padding=1),
+            )
+        def forward(self, x):
+            return self.decoder(self.encoder(x.transpose(1, 2))).transpose(1, 2)
+
+    class LSTMAE(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.encoder = nn.LSTM(n_features, 48, batch_first=True)
+            self.to_latent = nn.Linear(48, 24)
+            self.from_latent = nn.Linear(24, 48)
+            self.decoder = nn.LSTM(48, 48, batch_first=True)
+            self.output = nn.Linear(48, n_features)
+        def forward(self, x):
+            _, (h, _) = self.encoder(x)
+            z = torch.relu(self.to_latent(h[-1]))
+            repeated = self.from_latent(z).unsqueeze(1).repeat(1, x.shape[1], 1)
+            decoded, _ = self.decoder(repeated)
+            return self.output(decoded)
+
+    model = ConvAE() if kind == "1D-CNN Autoencoder" else LSTMAE()
+    model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    loss_fn = nn.MSELoss()
+    train_loader = DataLoader(TensorDataset(torch.from_numpy(train_seq)),
+                              batch_size=BATCH_SIZE, shuffle=True, drop_last=False)
+    val_loader = DataLoader(TensorDataset(torch.from_numpy(val_seq)),
+                            batch_size=BATCH_SIZE, shuffle=False)
+    best_loss, best_state, stale = float("inf"), None, 0
+    for epoch in range(EPOCHS):
+        model.train()
+        for (batch,) in train_loader:
+            batch = batch.to(device)
+            optimizer.zero_grad(set_to_none=True)
+            loss = loss_fn(model(batch), batch)
+            loss.backward()
+            optimizer.step()
+        model.eval()
+        losses = []
+        with torch.no_grad():
+            for (batch,) in val_loader:
+                batch = batch.to(device)
+                losses.append(loss_fn(model(batch), batch).item())
+        val_loss = float(np.mean(losses)) if losses else float("inf")
+        print(f"    {kind}: epoch {epoch + 1}/{EPOCHS}, val reconstruction loss={val_loss:.6f}")
+        if val_loss < best_loss:
+            best_loss, best_state, stale = val_loss, {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}, 0
+        else:
+            stale += 1
+            if stale >= PATIENCE:
+                break
+    if best_state:
+        model.load_state_dict(best_state)
+    model.eval()
+
+    def errors(X):
+        output = []
+        loader = DataLoader(TensorDataset(torch.from_numpy(X)),
+                            batch_size=BATCH_SIZE, shuffle=False)
+        with torch.no_grad():
+            for (batch,) in loader:
+                batch = batch.to(device)
+                reconstructed = model(batch)
+                # Endpoint score: reconstruction error at the last step.
+                err = torch.mean((reconstructed[:, -1, :] - batch[:, -1, :]) ** 2, dim=1)
+                output.append(err.cpu().numpy())
+        return np.concatenate(output) if output else np.empty(0)
+    return model, errors(val_seq), errors(test_seq), str(device)
+
+
+def main():
+    started = time.time()
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(SEED)
+    features = load_manifest()
+    print(f"Project: {ROOT}")
+    print(f"Features: {len(features)} | Sequence length: {SEQUENCE_LENGTH}")
+    print("Loading the three parquet splits...")
+    train = load_split("train", features)
+    val = load_split("val", features)
+    test = load_split("test", features)
+    supervised_train = load_split("supervised_train", features)
+
+    # Fill values using medians computed exclusively from the training split.
+    medians = train[features].replace([np.inf, -np.inf], np.nan).median().fillna(0.0)
+    X_train_raw, y_train = point_arrays(train, features, medians)
+    X_val_raw, y_val = point_arrays(val, features, medians)
+    X_test_raw, y_test = point_arrays(test, features, medians)
+    X_supervised_raw, y_supervised = point_arrays(
+        supervised_train, features, medians
+    )
+    if y_train.sum() != 0:
+        raise ValueError("Training split must contain normal rows only.")
+    if y_val.sum() == 0 or y_test.sum() == 0:
+        raise ValueError("Validation and test must contain injected anomalies.")
+    if y_supervised.sum() == 0 or y_supervised.sum() == len(y_supervised):
+        raise ValueError("Supervised training data must contain both classes.")
+    if not np.isfinite(X_supervised_raw).all():
+        raise ValueError("Supervised training features contain non-finite values.")
+    scale_pos_weight = float((y_supervised == 0).sum() / y_supervised.sum())
+    print(f"Supervised training rows: {len(y_supervised):,}; "
+          f"anomalies: {int(y_supervised.sum()):,}; "
+          f"scale_pos_weight: {scale_pos_weight:.2f}")
+
+    scaler = StandardScaler()
+    scaler.fit(X_train_raw)
+    X_train = scaler.transform(X_train_raw).astype(np.float32)
+    X_val = scaler.transform(X_val_raw).astype(np.float32)
+    X_test = scaler.transform(X_test_raw).astype(np.float32)
+
+    # Save preprocessing metadata so the run is reproducible.
+    with (MODEL_DIR / "preprocessing.json").open("w", encoding="utf-8") as f:
+        json.dump({"seed": SEED, "features": features, "threshold_quantile": THRESHOLD_QUANTILE,
+                   "sequence_length": SEQUENCE_LENGTH, "scaler_mean": scaler.mean_.tolist(),
+                   "scaler_scale": scaler.scale_.tolist(), "train_medians": medians.to_dict()}, f, indent=2)
+
+    results = []
+    raw_scores: dict[str, tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]] = {}
+    point_val_rows = np.arange(len(val), dtype=int)
+    point_test_rows = np.arange(len(test), dtype=int)
+
+    # Classical models operate on rows. Use train-only random samples for fit.
+    train_idx = sample_indices(len(X_train), MAX_CLASSICAL_TRAIN, rng)
+    normal_val = X_val[y_val == 0]
+    print("\n[1/8] Isolation Forest")
+    model = IsolationForest(n_estimators=200, contamination="auto", random_state=SEED, n_jobs=-1)
+    model.fit(X_train[train_idx])
+    val_scores = -model.score_samples(X_val)
+    test_scores = -model.score_samples(X_test)
+    raw_scores["Isolation Forest"] = (y_val, val_scores, y_test, test_scores, point_val_rows, point_test_rows)
+    print("    fitted")
+
+    print("[2/8] PCA reconstruction")
+    pca_n = min(20, len(features), max(2, len(train_idx) - 1))
+    pca = PCA(n_components=pca_n, svd_solver="randomized", random_state=SEED)
+    pca.fit(X_train[train_idx])
+    val_scores = np.mean((X_val - pca.inverse_transform(pca.transform(X_val))) ** 2, axis=1)
+    test_scores = np.mean((X_test - pca.inverse_transform(pca.transform(X_test))) ** 2, axis=1)
+    raw_scores["PCA"] = (y_val, val_scores, y_test, test_scores, point_val_rows, point_test_rows)
+    print(f"    fitted with {pca_n} components")
+
+    print("[3/8] Gaussian Mixture Model")
+    gmm_idx = sample_indices(len(X_train), MAX_GMM_TRAIN, rng)
+    gmm = GaussianMixture(n_components=8, covariance_type="diag", reg_covar=1e-4,
+                          max_iter=100, random_state=SEED)
+    gmm.fit(X_train[gmm_idx])
+    val_scores = -gmm.score_samples(X_val)
+    test_scores = -gmm.score_samples(X_test)
+    raw_scores["Gaussian Mixture Model"] = (y_val, val_scores, y_test, test_scores, point_val_rows, point_test_rows)
+    print("    fitted")
+
+    # Supervised tree models use only the separate labelled training copy.
+    # Validation and test labels are not passed to either fit() call.
+    print("[4/8] LightGBM")
+    lgbm = LGBMClassifier(
+        objective="binary", n_estimators=300, learning_rate=0.05,
+        num_leaves=31, subsample=0.8, subsample_freq=1,
+        colsample_bytree=0.8, reg_lambda=1.0,
+        scale_pos_weight=scale_pos_weight,
+        random_state=SEED, n_jobs=-1, verbosity=-1,
+    )
+    lgbm.fit(X_supervised_raw, y_supervised)
+    val_scores = lgbm.predict_proba(X_val_raw)[:, 1]
+    test_scores = lgbm.predict_proba(X_test_raw)[:, 1]
+    raw_scores["LightGBM"] = (y_val, val_scores, y_test, test_scores, point_val_rows, point_test_rows)
+    joblib.dump(lgbm, MODEL_DIR / "lightgbm_supervised.joblib")
+    print("    fitted and saved")
+
+    print("[5/8] XGBoost")
+    xgb = XGBClassifier(
+        objective="binary:logistic", n_estimators=300,
+        max_depth=6, learning_rate=0.05,
+        subsample=0.8, colsample_bytree=0.8,
+        reg_lambda=1.0, scale_pos_weight=scale_pos_weight,
+        eval_metric="logloss", tree_method="hist",
+        random_state=SEED, n_jobs=-1,
+    )
+    xgb.fit(X_supervised_raw, y_supervised)
+    val_scores = xgb.predict_proba(X_val_raw)[:, 1]
+    test_scores = xgb.predict_proba(X_test_raw)[:, 1]
+    raw_scores["XGBoost"] = (y_val, val_scores, y_test, test_scores, point_val_rows, point_test_rows)
+    joblib.dump(xgb, MODEL_DIR / "xgboost_supervised.joblib")
+    print("    fitted and saved")
+
+    print("[6/8] Dense Autoencoder")
+    dense_idx = sample_indices(len(X_train), MAX_DENSE_TRAIN, rng)
+    dense, val_scores, test_scores = fit_dense_autoencoder(
+        X_train[dense_idx], X_val, X_test
+    )
+    raw_scores["Dense Autoencoder"] = (y_val, val_scores, y_test, test_scores, point_val_rows, point_test_rows)
+    print(f"    fitted in {dense.n_iter_} iterations")
+
+    # Temporal models: training windows use normal rows and stride 10.
+    print("\nBuilding temporal windows (host-aware; no cross-host windows)...")
+    train_seq, _, _ = make_sequences(
+        train, features, medians, scaler, stride=10, max_windows=MAX_SEQUENCE_TRAIN,
+        normal_only=True, rng=rng
+    )
+    val_seq, val_seq_y, val_rows = make_sequences(
+        val, features, medians, scaler, stride=1, max_windows=None, normal_only=False, rng=rng
+    )
+    test_seq, test_seq_y, test_rows = make_sequences(
+        test, features, medians, scaler, stride=1, max_windows=None, normal_only=False, rng=rng
+    )
+    # Thresholds must use normal validation endpoints only.
+    print(f"    train windows={len(train_seq):,}; validation windows={len(val_seq):,}; test windows={len(test_seq):,}")
+    if min(len(train_seq), len(val_seq), len(test_seq)) == 0:
+        raise ValueError("No temporal windows built; check split lengths and timestamps.")
+    # Keep sequence-model validation/test row scores aligned to endpoint labels.
+    print("[7/8] 1D-CNN Autoencoder")
+    cnn, val_scores, test_scores, device = train_sequence_model(
+        "1D-CNN Autoencoder", train_seq, val_seq, test_seq
+    )
+    raw_scores["1D-CNN Autoencoder"] = (val_seq_y, val_scores, test_seq_y, test_scores, val_rows, test_rows)
+    print(f"    trained on {device}")
+
+    print("[8/8] LSTM Autoencoder")
+    lstm, val_scores, test_scores, device = train_sequence_model(
+        "LSTM Autoencoder", train_seq, val_seq, test_seq
+    )
+    raw_scores["LSTM Autoencoder"] = (val_seq_y, val_scores, test_seq_y, test_scores, val_rows, test_rows)
+    print(f"    trained on {device}")
+
+    # Threshold from normal validation scores only; evaluate test once.
+    for name, (yv, sv, yt, st, val_rows_for_model, test_rows_for_model) in raw_scores.items():
+        normal_scores = sv[(yv == 0) & np.isfinite(sv)]
+        if len(normal_scores) == 0:
+            raise ValueError(f"No normal validation scores available for {name}")
+        threshold = float(np.quantile(normal_scores, THRESHOLD_QUANTILE))
+        metrics = score_metrics(yt, st, threshold)
+        metrics.update({"model": name, "threshold_source": "normal_validation_only",
+                        "threshold_quantile": THRESHOLD_QUANTILE})
+        if name in ("1D-CNN Autoencoder", "LSTM Autoencoder"):
+            metrics["score_unit"] = "sequence endpoint rows"
+            ev = event_metrics(test, test_rows, st, threshold)
+            metrics.update(ev)
+        else:
+            metrics["score_unit"] = "all test rows"
+        results.append(metrics)
+        print(f"\n{name}: precision={metrics['precision']:.4f}, recall={metrics['recall']:.4f}, "
+              f"F1={metrics['f1']:.4f}, PR-AUC={metrics['pr_auc_average_precision']:.4f}, "
+              f"FPR={metrics['false_positive_rate']:.4f}")
+
+    # Export aligned per-row scores so failures can be diagnosed without retraining.
+    score_frames = {"validation": [], "test": []}
+    type_rows = []
+    alert_rows = []
+    for name, (yv, sv, yt, st, val_rows_for_model, test_rows_for_model) in raw_scores.items():
+        val_threshold = float(np.quantile(sv[(yv == 0) & np.isfinite(sv)], THRESHOLD_QUANTILE))
+        for split_name, frame, labels, scores, row_ids, threshold in (
+            ("validation", val, yv, sv, val_rows_for_model, val_threshold),
+            ("test", test, yt, st, test_rows_for_model, val_threshold),
+        ):
+            valid = np.isfinite(scores)
+            aligned_rows = np.asarray(row_ids)[valid].astype(int)
+            aligned_scores = np.asarray(scores)[valid]
+            aligned_labels = np.asarray(labels)[valid].astype(int)
+            scored_frame = frame.iloc[aligned_rows][["hostname", "timestamp", "label", "anomaly_type"]].copy()
+            scored_frame.insert(0, "row_index", aligned_rows)
+            scored_frame.insert(0, "split", split_name)
+            scored_frame.insert(0, "model", name)
+            scored_frame["score"] = aligned_scores
+            scored_frame["threshold"] = threshold
+            scored_frame["prediction"] = (aligned_scores > threshold).astype(int)
+            score_frames[split_name].append(scored_frame)
+            if split_name == "test":
+                scored_frame["is_true_positive"] = ((aligned_labels == 1) & (aligned_scores > threshold)).astype(int)
+                scored_frame["is_false_negative"] = ((aligned_labels == 1) & (aligned_scores <= threshold)).astype(int)
+                scored_frame["is_false_positive"] = ((aligned_labels == 0) & (aligned_scores > threshold)).astype(int)
+                # Per anomaly-type diagnostic; use actual test labels and a threshold
+                # derived only from normal validation data.
+                for anomaly_type, group in scored_frame[scored_frame["label"].astype(int) == 1].groupby("anomaly_type", dropna=False):
+                    type_rows.append({
+                        "model": name,
+                        "anomaly_type": str(anomaly_type),
+                        "anomaly_rows": int(len(group)),
+                        "detected_rows": int(group["prediction"].sum()),
+                        "row_recall": float(group["prediction"].mean()),
+                        "mean_score": float(group["score"].mean()),
+                        "max_score": float(group["score"].max()),
+                        "threshold": threshold,
+                    })
+                # Approximate alert burden. At 10-second sampling, 360 rows = one host-hour.
+                normal_rows = int((scored_frame["label"].astype(int) == 0).sum())
+                false_positive_rows = int(scored_frame["is_false_positive"].sum())
+                alert_rows.append({
+                    "model": name,
+                    "scored_rows": int(len(scored_frame)),
+                    "scored_normal_rows": normal_rows,
+                    "false_positive_rows": false_positive_rows,
+                    "false_positives_per_100_host_hours": float(false_positive_rows / (normal_rows / 360.0) * 100.0) if normal_rows else float("nan"),
+                    "note": "Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents.",
+                })
+
+    for split_name, frames in score_frames.items():
+        if frames:
+            pd.concat(frames, ignore_index=True).to_csv(REPORT_DIR / f"row_scores_{split_name}.csv", index=False)
+    pd.DataFrame(type_rows).to_csv(REPORT_DIR / "anomaly_type_diagnostics.csv", index=False)
+    pd.DataFrame(alert_rows).to_csv(REPORT_DIR / "false_positive_burden.csv", index=False)
+
+    result_df = pd.DataFrame(results)
+    columns = ["model", "score_unit", "threshold", "threshold_source", "threshold_quantile",
+               "n_scored", "test_anomalies", "precision", "recall", "f1",
+               "pr_auc_average_precision", "false_positive_rate", "true_positives",
+               "false_positives", "false_negatives", "true_negatives",
+               "labelled_host_type_runs", "detected_host_type_runs", "event_recall", "note"]
+    result_df = result_df.reindex(columns=[c for c in columns if c in result_df.columns])
+    csv_path = REPORT_DIR / "model_comparison.csv"
+    json_path = REPORT_DIR / "model_comparison.json"
+    result_df.to_csv(csv_path, index=False)
+    result_df.to_json(json_path, orient="records", indent=2)
+    summary = {
+        "seed": SEED,
+        "features": features,
+        "sequence_length": SEQUENCE_LENGTH,
+        "threshold_quantile": THRESHOLD_QUANTILE,
+        "threshold_protocol": "99th percentile of normal validation scores only",
+        "train_rows": int(len(train)),
+        "validation_rows": int(len(val)),
+        "test_rows": int(len(test)),
+        "train_anomalies": int(y_train.sum()),
+        "validation_anomalies": int(y_val.sum()),
+        "test_anomalies": int(y_test.sum()),
+        "models": result_df.to_dict(orient="records"),
+        "elapsed_seconds": round(time.time() - started, 2),
+        "limitations": [
+            "Only five synthetic events were injected into the test split; event-level results are preliminary.",
+            "This benchmark tests the generated scenarios and does not establish real-world incident performance.",
+            "Temporal models score sequence endpoints only; the first SEQUENCE_LENGTH-1 rows per host are not scored.",
+            "LightGBM and XGBoost learn injected synthetic training anomalies; real-world generalization is unverified."
+        ],
+    }
+    with (REPORT_DIR / "run_metadata.json").open("w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=2, default=str)
+    print("\n========== COMPARISON COMPLETE ==========")
+    print(result_df.to_string(index=False))
+    print(f"\nSaved CSV:  {csv_path}")
+    print(f"Saved JSON: {json_path}")
+    print(f"Saved run metadata: {REPORT_DIR / 'run_metadata.json'}")
+    print(f"Saved row-level validation/test scores and anomaly-type diagnostics in: {REPORT_DIR}")
+    print(f"Elapsed: {summary['elapsed_seconds']:.1f} seconds")
+
+
+if __name__ == "__main__":
+    main()

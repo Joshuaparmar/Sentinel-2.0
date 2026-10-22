@@ -1,0 +1,9 @@
+model,scored_rows,scored_normal_rows,false_positive_rows,false_positives_per_100_host_hours,note
+Isolation Forest,172300,172195,1303,272.4120909434072,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+PCA,172300,172195,1211,253.1780829873109,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+Gaussian Mixture Model,172300,172195,2693,563.0128633235576,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+LightGBM,172300,172195,2599,543.36072475972,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+XGBoost,172300,172195,2033,425.02976276895384,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+Dense Autoencoder,172300,172195,1173,245.23360144022766,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+1D-CNN Autoencoder,169400,169295,2356,500.9953040550518,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."
+LSTM Autoencoder,169400,169295,1560,331.7286393573348,"Approximation assumes 10-second sampling; this is false-positive rows per 100 normal host-hours, not deduplicated alert incidents."

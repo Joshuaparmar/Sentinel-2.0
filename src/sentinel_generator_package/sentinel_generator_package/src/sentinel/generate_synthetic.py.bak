@@ -1,0 +1,530 @@
+"""
+SENTINEL 2.0 synthetic telemetry generator.
+
+Safety principles:
+- Reads the source Parquet file without modifying it.
+- Splits chronologically and purges rows around split boundaries.
+- Keeps training labels normal.
+- Injects synthetic events only into validation and test.
+- Keeps validation/test host pools disjoint when enough hosts exist.
+- Excludes metadata/labels from the model feature manifest.
+- Writes outputs only to the requested output directory.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import sys
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+TIME_CANDIDATES = ("timestamp", "time", "datetime", "ts")
+HOST_CANDIDATES = ("hostname", "host", "node", "node_name")
+LABEL_COL = "label"
+TYPE_COL = "anomaly_type"
+EVENT_COL = "event_id"
+SOURCE_LABEL_COL = "source_label"
+SOURCE_ROW_COL = "source_row_id"
+RESERVED_ADDED = {TYPE_COL, EVENT_COL, SOURCE_LABEL_COL, SOURCE_ROW_COL}
+METADATA_EXCLUDE = {
+    LABEL_COL, TYPE_COL, EVENT_COL, SOURCE_LABEL_COL, SOURCE_ROW_COL,
+    "xid", "XID", "hostname", "host", "node", "node_name",
+    "timestamp", "time", "datetime", "ts", "node_state",
+    "allocation_id", "job_id", "job_begin_time", "job_end_time",
+}
+
+POWER_HINTS = ("power", "watt", "pwr")
+TEMP_HINTS = ("temp", "temperature")
+SCENARIOS = (
+    "abrupt_power_drop",
+    "thermal_anomaly",
+    "transient_spike",
+    "gradual_degradation",
+    "multi_host_event",
+)
+
+
+@dataclass
+class Event:
+    event_id: str
+    split: str
+    anomaly_type: str
+    start_time: str
+    end_time: str
+    duration_steps: int
+    hosts: str
+    target_severity: float
+    realized_median_power_change_pct: float | None = None
+    realized_median_temp_change: float | None = None
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for block in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def find_column(columns, candidates, description):
+    lower = {str(c).lower(): c for c in columns}
+    for name in candidates:
+        if name.lower() in lower:
+            return lower[name.lower()]
+    raise ValueError(f"Could not identify {description} column. Tried: {candidates}")
+
+
+def validate_raw_columns(df: pd.DataFrame) -> tuple[str, str]:
+    collisions = sorted(set(df.columns) & RESERVED_ADDED)
+    if collisions:
+        raise ValueError(
+            "Source contains reserved generator column(s): "
+            + ", ".join(collisions)
+            + ". Rename them explicitly before generation."
+        )
+    time_col = find_column(df.columns, TIME_CANDIDATES, "timestamp")
+    host_col = find_column(df.columns, HOST_CANDIDATES, "host")
+    if df[time_col].isna().any():
+        raise ValueError("Timestamp column contains missing values.")
+    if df[host_col].isna().any():
+        raise ValueError("Host column contains missing values.")
+    return time_col, host_col
+
+
+def identify_features(df: pd.DataFrame, time_col: str, host_col: str) -> dict[str, list[str]]:
+    numeric = [
+        c for c in df.columns
+        if pd.api.types.is_numeric_dtype(df[c])
+        and c not in METADATA_EXCLUDE
+        and c not in {time_col, host_col}
+    ]
+    power = [c for c in numeric if any(h in str(c).lower() for h in POWER_HINTS)]
+    temps = [c for c in numeric if any(h in str(c).lower() for h in TEMP_HINTS)]
+    # Only telemetry numeric columns are eligible. Do not silently use arbitrary
+    # numeric IDs or counters as model features.
+    features = sorted(set(power + temps))
+    if not features:
+        raise ValueError(
+            "No numeric telemetry features matched power/temperature naming rules. "
+            "Review the source schema and extend the documented feature rules."
+        )
+    return {"features": features, "power": power, "temperature": temps}
+
+
+def _as_datetime(series: pd.Series) -> pd.Series:
+    parsed = pd.to_datetime(series, errors="coerce", utc=True)
+    if parsed.isna().any():
+        raise ValueError("Timestamp column contains values that cannot be parsed.")
+    return parsed
+
+
+def split_chronologically(df: pd.DataFrame, time_col: str, train_frac: float,
+                          val_frac: float, purge_steps: int):
+    if not (0 < train_frac < 1 and 0 < val_frac < 1 and train_frac + val_frac < 1):
+        raise ValueError("Fractions must be positive and train_frac + val_frac < 1.")
+    times = np.array(sorted(df[time_col].drop_duplicates()))
+    if len(times) < 10:
+        raise ValueError("Need at least 10 distinct timestamps to split safely.")
+    i1 = int(len(times) * train_frac)
+    i2 = int(len(times) * (train_frac + val_frac))
+    if i1 <= purge_steps or i2 + purge_steps >= len(times):
+        raise ValueError("Dataset is too small for the requested fractions and purge gap.")
+    train_end = times[i1 - 1]
+    val_start = times[i1 + purge_steps]
+    val_end = times[i2 - 1]
+    test_start = times[i2 + purge_steps]
+    train = df[df[time_col] <= train_end].copy()
+    val = df[(df[time_col] >= val_start) & (df[time_col] <= val_end)].copy()
+    test = df[df[time_col] >= test_start].copy()
+    purged = len(df) - len(train) - len(val) - len(test)
+    if min(len(train), len(val), len(test)) == 0:
+        raise ValueError("One or more splits are empty.")
+    return train, val, test, int(purged), {
+        "train_end": str(train_end), "val_start": str(val_start),
+        "val_end": str(val_end), "test_start": str(test_start),
+        "purge_steps": purge_steps,
+    }
+
+
+def _derive_limits(train: pd.DataFrame, features: dict[str, list[str]], headroom: float):
+    limits = {}
+    for col in features["features"]:
+        values = pd.to_numeric(train[col], errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+        if values.empty:
+            raise ValueError(f"Feature {col} has no finite training values.")
+        # Training-derived envelope: max of observed range and a robust upper quantile,
+        # with a documented multiplicative headroom. This is a synthetic-data guardrail,
+        # not a claim about the physical sensor's engineering maximum.
+        lo = float(values.quantile(0.001))
+        hi = float(values.quantile(0.999))
+        if hi < lo:
+            lo, hi = hi, lo
+        span = max(hi - lo, abs(hi) * 0.05, 1e-6)
+        limits[col] = {"min": lo - headroom * span, "max": hi + headroom * span}
+    return limits
+
+
+def _temp_summary_groups(cols: list[str]):
+    # Recognize min/mean/max summaries only when the same prefix is shared.
+    groups = {}
+    for c in cols:
+        name = str(c).lower()
+        suffix = None
+        for token in ("_min", "_mean", "_avg", "_max"):
+            if name.endswith(token):
+                suffix = token[1:]
+                prefix = name[:-len(token)]
+                groups.setdefault(prefix, {})[suffix] = c
+                break
+    return [g for g in groups.values() if "min" in g and ("mean" in g or "avg" in g) and "max" in g]
+
+
+def _event_parameters(kind: str, rng: np.random.Generator):
+    if kind == "abrupt_power_drop":
+        return int(rng.integers(12, 19)), float(rng.uniform(0.35, 0.50))
+    if kind == "thermal_anomaly":
+        return int(rng.integers(18, 25)), float(rng.uniform(5.0, 8.0))
+    if kind == "transient_spike":
+        return int(rng.integers(2, 5)), float(rng.uniform(1.35, 1.65))
+    if kind == "gradual_degradation":
+        return int(rng.integers(24, 37)), float(rng.uniform(0.45, 0.65))
+    return int(rng.integers(9, 15)), float(rng.uniform(0.60, 0.75))
+
+
+def _apply_scenario(df, mask, kind, params, features, limits):
+    power_cols, temp_cols = features["power"], features["temperature"]
+    severity = params
+    if kind == "abrupt_power_drop":
+        for c in power_cols:
+            df.loc[mask, c] = pd.to_numeric(df.loc[mask, c], errors="coerce") * severity
+    elif kind == "thermal_anomaly":
+        for c in temp_cols:
+            df.loc[mask, c] = pd.to_numeric(df.loc[mask, c], errors="coerce") + severity
+    elif kind == "transient_spike":
+        for c in power_cols:
+            df.loc[mask, c] = pd.to_numeric(df.loc[mask, c], errors="coerce") * severity
+    elif kind == "gradual_degradation":
+        # Mask is supplied in chronological row order for one host. The caller
+        # provides a per-row factor through params when params is an array.
+        factor = np.asarray(severity)
+        for c in power_cols:
+            vals = pd.to_numeric(df.loc[mask, c], errors="coerce").to_numpy(dtype=float)
+            df.loc[mask, c] = vals * factor
+    elif kind == "multi_host_event":
+        for c in power_cols:
+            df.loc[mask, c] = pd.to_numeric(df.loc[mask, c], errors="coerce") * severity
+        for c in temp_cols:
+            df.loc[mask, c] = pd.to_numeric(df.loc[mask, c], errors="coerce") + 2.0
+    # Enforce training-derived per-feature envelopes on the affected rows.
+    for c in features["features"]:
+        vals = pd.to_numeric(df.loc[mask, c], errors="coerce")
+        df.loc[mask, c] = vals.clip(lower=limits[c]["min"], upper=limits[c]["max"])
+
+
+def inject_events(split_df: pd.DataFrame, split_name: str, time_col: str, host_col: str,
+                  features: dict[str, list[str]], limits, rng: np.random.Generator,
+                  n_events: int, event_prefix: str, allowed_hosts: list[str],
+                  window_steps: int, sample_interval_seconds: int):
+    out = split_df.copy()
+    out[LABEL_COL] = np.zeros(len(out), dtype=np.int8)
+    out[TYPE_COL] = "normal"
+    out[EVENT_COL] = ""
+    if n_events == 0 or out.empty:
+        return out, []
+    out["_sentinel_time"] = _as_datetime(out[time_col])
+    times = np.array(sorted(out["_sentinel_time"].unique()))
+    if len(times) <= window_steps + 2:
+        raise ValueError(f"{split_name} has too few timestamps for event windows.")
+    host_rows = {str(h): g.index.to_numpy() for h, g in out.groupby(host_col, sort=False)}
+    eligible = [h for h in allowed_hosts if str(h) in host_rows]
+    if not eligible:
+        raise ValueError(f"No eligible hosts for {split_name} event injection.")
+    power_cols = features["power"]
+    temp_cols = features["temperature"]
+    event_records = []
+    occupied = set()
+    used_hosts = set()
+    # Cycle through the five scenarios, shuffled deterministically.
+    kinds = list(SCENARIOS)
+    rng.shuffle(kinds)
+    kinds = (kinds * math.ceil(n_events / len(kinds)))[:n_events]
+    for eidx, kind in enumerate(kinds, start=1):
+        duration, severity = _event_parameters(kind, rng)
+        duration = min(duration, max(2, len(times) // 8))
+        # Select a host pool for this event. Multi-host scenario uses several hosts.
+        available_hosts = [h for h in eligible if str(h) not in used_hosts]
+        if not available_hosts:
+            # Reusing a host is allowed only if its event window is disjoint.
+            available_hosts = eligible
+        host_count = min(len(available_hosts), 4 if kind == "multi_host_event" else 1)
+        if host_count < 1:
+            break
+        chosen_hosts = [str(x) for x in rng.choice(np.array(available_hosts, dtype=object),
+                                                    size=host_count, replace=False)]
+        # Find a contiguous event window with no overlap in timestamp range.
+        candidates = np.arange(0, len(times) - duration)
+        rng.shuffle(candidates)
+        start_pos = None
+        for pos in candidates:
+            window_positions = set(range(int(pos), int(pos) + duration))
+            if not (window_positions & occupied):
+                start_pos = int(pos)
+                occupied.update(window_positions)
+                break
+        if start_pos is None:
+            raise ValueError(f"Could not place non-overlapping event {event_prefix}_E{eidx:02d}; reduce event count/duration.")
+        event_times = times[start_pos:start_pos + duration]
+        start_t, end_t = pd.Timestamp(event_times[0]), pd.Timestamp(event_times[-1])
+        event_id = f"{event_prefix}_E{eidx:02d}"
+        for host in chosen_hosts:
+            host_mask = out[host_col].astype(str).eq(host) & out["_sentinel_time"].isin(event_times)
+            if not host_mask.any():
+                continue
+            if kind == "gradual_degradation":
+                row_times = out.loc[host_mask, "_sentinel_time"]
+                pos = pd.Index(event_times).get_indexer(row_times)
+                factors = np.linspace(1.0, severity, len(event_times))[pos]
+                _apply_scenario(out, host_mask, kind, factors, features, limits)
+            else:
+                _apply_scenario(out, host_mask, kind, severity, features, limits)
+            out.loc[host_mask, LABEL_COL] = 1
+            out.loc[host_mask, TYPE_COL] = kind
+            out.loc[host_mask, EVENT_COL] = event_id
+        used_hosts.update(chosen_hosts)
+        event_records.append(Event(
+            event_id=event_id, split=split_name, anomaly_type=kind,
+            start_time=start_t.isoformat(), end_time=end_t.isoformat(),
+            duration_steps=int(duration), hosts=";".join(chosen_hosts),
+            target_severity=float(severity) if np.isscalar(severity) else float(np.min(severity))
+        ))
+    out.drop(columns=["_sentinel_time"], inplace=True)
+    # Restore numeric feature dtypes where safe; integer sensor fields remain integer
+    # only if generated values are integral, otherwise float is necessary and documented.
+    for c in features["features"]:
+        original_dtype = split_df[c].dtype
+        if pd.api.types.is_integer_dtype(original_dtype) and np.allclose(
+            pd.to_numeric(out[c], errors="coerce").dropna() % 1, 0
+        ):
+            out[c] = out[c].astype(original_dtype)
+    return out, [asdict(e) for e in event_records]
+
+
+def validate_split(df, name, time_col, host_col, features, limits, training=False):
+    errors = []
+    if df.empty:
+        errors.append(f"{name}: empty split")
+    if df[LABEL_COL].isna().any():
+        errors.append(f"{name}: missing labels")
+    if training and (df[LABEL_COL] != 0).any():
+        errors.append(f"{name}: training contains anomaly labels")
+    if not training:
+        bad = (df[LABEL_COL] == 1) & ((df[TYPE_COL] == "normal") | (df[EVENT_COL] == ""))
+        if bad.any():
+            errors.append(f"{name}: anomaly rows missing event metadata")
+    for c in features["features"]:
+        vals = pd.to_numeric(df[c], errors="coerce")
+        if vals.isna().any() or not np.isfinite(vals.to_numpy(dtype=float)).all():
+            errors.append(f"{name}: non-finite values in {c}")
+        if c in limits and ((vals < limits[c]["min"] - 1e-9) | (vals > limits[c]["max"] + 1e-9)).any():
+            errors.append(f"{name}: {c} outside training-derived envelope")
+    # Check recognized temperature summary triples on every output row.
+    for group in _temp_summary_groups(features["temperature"]):
+        mean_col = group.get("mean", group.get("avg"))
+        if ((df[group["min"]] > df[mean_col]) | (df[mean_col] > df[group["max"]])).any():
+            errors.append(f"{name}: temperature summary ordering violation in {group}")
+    if errors:
+        raise ValueError("Validation failed:\n- " + "\n- ".join(errors))
+
+
+def build_report(source, source_hash_before, source_hash_after, splits, features,
+                 limits, events, boundaries, purged, args):
+    report = {
+        "title": "SENTINEL 2.0 synthetic dataset report",
+        "seed": args.seed,
+        "source": str(source),
+        "source_sha256_before": source_hash_before,
+        "source_sha256_after": source_hash_after,
+        "source_unchanged": source_hash_before == source_hash_after,
+        "split_boundaries": boundaries,
+        "purged_rows": purged,
+        "model_features": features["features"],
+        "feature_count": len(features["features"]),
+        "feature_envelopes": limits,
+        "splits": {},
+        "events": events,
+        "assumptions": {
+            "window_steps": args.window_steps,
+            "train_frac": args.train_frac,
+            "val_frac": args.val_frac,
+            "envelope_headroom_fraction": args.headroom,
+            "envelopes_are_training_derived_not_physical_sensor_specs": True,
+            "scenario_severity_ranges": {
+                "abrupt_power_drop": "power multiplier 0.35-0.50",
+                "thermal_anomaly": "temperature offset +5 to +8 degrees",
+                "transient_spike": "power multiplier 1.35-1.65",
+                "gradual_degradation": "power multiplier declines from 1.0 to 0.45-0.65",
+                "multi_host_event": "power multiplier 0.60-0.75; temperature offset +2",
+            },
+        },
+    }
+    for name, df in splits.items():
+        report["splits"][name] = {
+            "rows": int(len(df)),
+            "hosts": int(df[args.host_col].nunique()),
+            "label_counts": {str(k): int(v) for k, v in df[LABEL_COL].value_counts().sort_index().items()},
+            "anomaly_type_counts": {str(k): int(v) for k, v in df[TYPE_COL].value_counts().items()},
+        }
+    return report
+
+
+def generate(source: Path, output_dir: Path, seed=42, train_frac=0.6, val_frac=0.2,
+             window_steps=30, headroom=0.10, events_per_split=10):
+    source = source.resolve()
+    output_dir = output_dir.resolve()
+    if output_dir == source.parent or source.is_relative_to(output_dir):
+        raise ValueError("Output directory overlaps the source file location; choose a separate output directory.")
+    if output_dir.exists() and source.parent == output_dir:
+        raise ValueError("Output directory must not be the source dataset directory.")
+    source_hash_before = sha256_file(source)
+    raw = pd.read_parquet(source)
+    time_col, host_col = validate_raw_columns(raw)
+    raw[time_col] = _as_datetime(raw[time_col])
+    raw = raw.sort_values([time_col, host_col], kind="mergesort").reset_index(drop=True)
+    # Add stable row identifier only after raw-column collision validation.
+    raw[SOURCE_ROW_COL] = np.arange(len(raw), dtype=np.int64)
+    raw[SOURCE_LABEL_COL] = raw[LABEL_COL].copy() if LABEL_COL in raw.columns else 0
+    features = identify_features(raw, time_col, host_col)
+    if LABEL_COL not in raw.columns:
+        raw[LABEL_COL] = 0
+    # Original source labels are retained for audit, but synthetic task labels reset.
+    train, val, test, purged, boundaries = split_chronologically(
+        raw, time_col, train_frac, val_frac, window_steps
+    )
+    # Derive bounds from normal training telemetry only.
+    limits = _derive_limits(train, features, headroom)
+    train[LABEL_COL] = 0
+    train[TYPE_COL] = "normal"
+    train[EVENT_COL] = ""
+    train = train.drop(columns=[SOURCE_ROW_COL], errors="ignore")
+    # Disjoint host pools for validation and test, if >= 2 hosts.
+    hosts = np.array(sorted(raw[host_col].astype(str).unique()))
+    rng = np.random.default_rng(seed)
+    rng.shuffle(hosts)
+    if len(hosts) >= 2:
+        val_hosts = list(hosts[:max(1, len(hosts)//2)])
+        test_hosts = list(hosts[max(1, len(hosts)//2):])
+    else:
+        val_hosts = test_hosts = list(hosts)
+    val_out, val_events = inject_events(
+        val, "validation", time_col, host_col, features, limits,
+        np.random.default_rng(seed + 1), events_per_split, "VAL", val_hosts,
+        window_steps, 10
+    )
+    test_out, test_events = inject_events(
+        test, "test", time_col, host_col, features, limits,
+        np.random.default_rng(seed + 2), events_per_split, "TEST", test_hosts,
+        window_steps, 10
+    )
+    # Drop internal source row IDs; retain source_label as provenance metadata.
+    val_out = val_out.drop(columns=[SOURCE_ROW_COL], errors="ignore")
+    test_out = test_out.drop(columns=[SOURCE_ROW_COL], errors="ignore")
+    for name, df, is_train in (
+        ("train", train, True), ("validation", val_out, False), ("test", test_out, False)
+    ):
+        validate_split(df, name, time_col, host_col, features, limits, training=is_train)
+    event_rows = val_events + test_events
+    # Event-time disjointness and host-pool separation are explicitly audited.
+    val_host_set = set(val_hosts)
+    test_host_set = set(test_hosts)
+    if len(hosts) >= 2 and val_host_set & test_host_set:
+        raise ValueError("Validation and test host pools overlap.")
+    source_hash_after = sha256_file(source)
+    if source_hash_before != source_hash_after:
+        raise RuntimeError("Source file changed during generation.")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    # Ensure output paths cannot overwrite source.
+    outputs = {
+        "synthetic_train.parquet": train,
+        "synthetic_val.parquet": val_out,
+        "synthetic_test.parquet": test_out,
+    }
+    for filename, df in outputs.items():
+        path = output_dir / filename
+        if path.resolve() == source:
+            raise ValueError("Refusing to overwrite source dataset.")
+        df.to_parquet(path, index=False)
+    events_df = pd.DataFrame(event_rows)
+    events_df.to_csv(output_dir / "synthetic_events.csv", index=False)
+    manifest = {
+        "feature_count": len(features["features"]),
+        "features": features["features"],
+        "excluded_columns": sorted(set(raw.columns) - set(features["features"])),
+        "note": "Only numeric power/temperature telemetry columns are eligible model inputs. Labels and metadata are excluded.",
+    }
+    (output_dir / "feature_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    report = build_report(
+        source, source_hash_before, source_hash_after,
+        {"train": train, "validation": val_out, "test": test_out},
+        features, limits, event_rows, boundaries, purged,
+        argparse.Namespace(seed=seed, window_steps=window_steps, train_frac=train_frac,
+                           val_frac=val_frac, headroom=headroom, host_col=host_col)
+    )
+    (output_dir / "synthetic_report.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    txt = [
+        "SENTINEL 2.0 SYNTHETIC DATASET REPORT",
+        "=" * 48,
+        f"Seed: {seed}",
+        f"Source: {source}",
+        f"Source SHA-256 before: {source_hash_before}",
+        f"Source SHA-256 after : {source_hash_after}",
+        f"Source unchanged: {source_hash_before == source_hash_after}",
+        f"Purged rows: {purged}",
+        f"Model features ({len(features['features'])}): {', '.join(features['features'])}",
+        "",
+    ]
+    for name, df in (("TRAIN", train), ("VALIDATION", val_out), ("TEST", test_out)):
+        txt += [f"{name}: {len(df)} rows, {df[host_col].nunique()} hosts",
+                f"Labels: {df[LABEL_COL].value_counts().to_dict()}",
+                f"Anomaly types: {df[TYPE_COL].value_counts().to_dict()}", ""]
+    txt += [f"Events: {len(event_rows)}",
+            "Note: sensor envelopes are derived from training data and are not engineering specifications."]
+    (output_dir / "synthetic_report.txt").write_text("\n".join(txt) + "\n", encoding="utf-8")
+    print(f"Source: {source}")
+    for filename, df in outputs.items():
+        print(f"Saved: {output_dir / filename} ({len(df):,} rows)")
+    print(f"Saved: {output_dir / 'synthetic_events.csv'} ({len(event_rows)} events)")
+    print(f"Saved reports and feature manifest in: {output_dir}")
+    print("All validation checks passed.")
+    return report
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Generate SENTINEL 2.0 synthetic telemetry splits.")
+    parser.add_argument("--source", required=True, type=Path, help="Original source Parquet file (read-only).")
+    parser.add_argument("--output-dir", required=True, type=Path, help="Separate output directory.")
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--train-frac", type=float, default=0.60)
+    parser.add_argument("--val-frac", type=float, default=0.20)
+    parser.add_argument("--window-steps", type=int, default=30, help="Purge gap in timestamps between splits.")
+    parser.add_argument("--headroom", type=float, default=0.10, help="Fractional headroom beyond training quantile envelope.")
+    parser.add_argument("--events-per-split", type=int, default=10)
+    args = parser.parse_args(argv)
+    if args.window_steps < 1 or args.events_per_split < 1:
+        parser.error("--window-steps and --events-per-split must be positive.")
+    try:
+        generate(args.source, args.output_dir, args.seed, args.train_frac, args.val_frac,
+                 args.window_steps, args.headroom, args.events_per_split)
+    except Exception as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,1251 @@
+{
+  "title": "SENTINEL 2.0 V3 synthetic dataset report",
+  "generator_version": "3.0.0",
+  "generated_at_utc": "2026-10-22T11:58:37.034525+00:00",
+  "environment": {
+    "python": "3.14.4",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6"
+  },
+  "scope": "Generator validation only. Not a model evaluation; not evidence of real-world realism.",
+  "seed": 42,
+  "seed_derivation": "np.random.SeedSequence(entropy=seed, spawn_key=(stream_id,)) with stream ids {'host_pools': 0, 'supervised_train': 1, 'validation': 2, 'test': 3}; per-event seed = SeedSequence(entropy=seed, spawn_key=(stream_id, 1 + draft_index)).",
+  "sampling_interval_seconds": 10,
+  "source": {
+    "path": "C:\\Users\\Shirley\\joshua\\CRCE\\CAPSTONE\\Sentinel\\dataset\\ClusterWise_mini\\olcf_task\\train.parquet",
+    "sha256_before": "93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7",
+    "sha256_after": "93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7",
+    "unchanged": true,
+    "audit": {
+      "rows": 864000,
+      "hosts": 100,
+      "timestamps": 8640,
+      "complete_panel": true,
+      "duplicate_host_time_rows": 0,
+      "source_label_nonzero": 0,
+      "interval_seconds_top_counts": {
+        "10": 8639
+      },
+      "irregular_intervals": 0,
+      "feature_dtype": "float32",
+      "feature_count": 28,
+      "power_features": 10,
+      "temperature_features": 18,
+      "preexisting_summary_violations": 0,
+      "time_start": "2020-01-01 00:00:00",
+      "time_end": "2020-01-01 23:59:50"
+    }
+  },
+  "split": {
+    "n_timestamps": 8640,
+    "purge_steps": 30,
+    "step_bounds": {
+      "train": [
+        0,
+        5184
+      ],
+      "validation": [
+        5214,
+        6912
+      ],
+      "test": [
+        6942,
+        8640
+      ]
+    },
+    "purged_step_ranges": [
+      [
+        5184,
+        5214
+      ],
+      [
+        6912,
+        6942
+      ]
+    ],
+    "purged_rows": 6000,
+    "boundaries": {
+      "train_start": "2020-01-01 00:00:00",
+      "train_end": "2020-01-01 14:23:50",
+      "validation_start": "2020-01-01 14:29:00",
+      "validation_end": "2020-01-01 19:11:50",
+      "test_start": "2020-01-01 19:17:00",
+      "test_end": "2020-01-01 23:59:50"
+    },
+    "fractions": {
+      "train": 0.6,
+      "validation": 0.2,
+      "test": 0.2
+    }
+  },
+  "host_pools": {
+    "supervised_train": {
+      "hosts": 34,
+      "names": [
+        "c30n13",
+        "c30n18",
+        "c31n13",
+        "c31n14",
+        "c33n10",
+        "d13n03",
+        "d14n08",
+        "d14n09",
+        "d15n02",
+        "d15n04",
+        "d17n07",
+        "d17n11",
+        "d17n12",
+        "d17n18",
+        "d19n15",
+        "d19n16",
+        "d19n18",
+        "d20n03",
+        "d20n04",
+        "d20n05",
+        "d20n08",
+        "d20n15",
+        "d20n16",
+        "d21n13",
+        "d21n16",
+        "d21n18",
+        "d29n02",
+        "g01n06",
+        "g01n08",
+        "g01n17",
+        "g02n05",
+        "g02n14",
+        "g05n01",
+        "g06n14"
+      ]
+    },
+    "validation": {
+      "hosts": 33,
+      "names": [
+        "b23n07",
+        "c30n07",
+        "c30n16",
+        "c30n17",
+        "c31n01",
+        "c31n04",
+        "c31n06",
+        "c31n15",
+        "c32n13",
+        "d03n03",
+        "d03n04",
+        "d03n12",
+        "d09n14",
+        "d12n09",
+        "d13n15",
+        "d14n11",
+        "d17n06",
+        "d19n04",
+        "d19n06",
+        "d19n14",
+        "d20n11",
+        "d20n13",
+        "d20n18",
+        "d21n12",
+        "d29n15",
+        "f17n06",
+        "g01n14",
+        "g01n15",
+        "g02n11",
+        "g02n15",
+        "g02n17",
+        "g32n10",
+        "g34n09"
+      ]
+    },
+    "test": {
+      "hosts": 33,
+      "names": [
+        "b06n01",
+        "c30n10",
+        "c31n12",
+        "c32n08",
+        "c32n09",
+        "c32n10",
+        "c32n18",
+        "c33n02",
+        "c33n06",
+        "c35n14",
+        "d02n04",
+        "d02n05",
+        "d03n10",
+        "d05n09",
+        "d09n08",
+        "d13n17",
+        "d16n16",
+        "d19n02",
+        "d19n03",
+        "d19n05",
+        "d19n07",
+        "d20n06",
+        "d20n09",
+        "d21n05",
+        "d21n15",
+        "d22n03",
+        "d28n18",
+        "g01n07",
+        "g02n03",
+        "g02n09",
+        "g02n10",
+        "g02n18",
+        "h35n10"
+      ]
+    }
+  },
+  "host_separation": "anomaly hosts disjoint across supervised_train, validation and test (check C04)",
+  "features": {
+    "count": 28,
+    "dtype": "float32",
+    "power": [
+      "p0_gpu0_power",
+      "p0_gpu1_power",
+      "p0_gpu2_power",
+      "p0_power",
+      "p1_gpu0_power",
+      "p1_gpu1_power",
+      "p1_gpu2_power",
+      "p1_power",
+      "ps0_input_power",
+      "ps1_input_power"
+    ],
+    "temperature": [
+      "gpu0_core_temp",
+      "gpu0_mem_temp",
+      "gpu1_core_temp",
+      "gpu1_mem_temp",
+      "gpu2_core_temp",
+      "gpu2_mem_temp",
+      "gpu3_core_temp",
+      "gpu3_mem_temp",
+      "gpu4_core_temp",
+      "gpu4_mem_temp",
+      "gpu5_core_temp",
+      "gpu5_mem_temp",
+      "p0_temp_max",
+      "p0_temp_mean",
+      "p0_temp_min",
+      "p1_temp_max",
+      "p1_temp_mean",
+      "p1_temp_min"
+    ],
+    "summary_groups": [
+      {
+        "max": "p0_temp_max",
+        "mean": "p0_temp_mean",
+        "min": "p0_temp_min"
+      },
+      {
+        "max": "p1_temp_max",
+        "mean": "p1_temp_mean",
+        "min": "p1_temp_min"
+      }
+    ]
+  },
+  "datasets": {
+    "train": {
+      "rows": 518400,
+      "steps": 5184,
+      "hosts": 100,
+      "time_start": "2020-01-01 00:00:00",
+      "time_end": "2020-01-01 14:23:50",
+      "label_counts": {
+        "0": 518400
+      },
+      "anomaly_type_counts": {
+        "normal": 518400
+      }
+    },
+    "supervised_train": {
+      "rows": 518400,
+      "steps": 5184,
+      "hosts": 100,
+      "time_start": "2020-01-01 00:00:00",
+      "time_end": "2020-01-01 14:23:50",
+      "label_counts": {
+        "0": 511498,
+        "1": 6902
+      },
+      "anomaly_type_counts": {
+        "normal": 511498,
+        "multi_host_event": 2760,
+        "gradual_degradation": 1800,
+        "thermal_anomaly": 1263,
+        "abrupt_power_drop": 899,
+        "transient_spike": 180
+      }
+    },
+    "validation": {
+      "rows": 169800,
+      "steps": 1698,
+      "hosts": 100,
+      "time_start": "2020-01-01 14:29:00",
+      "time_end": "2020-01-01 19:11:50",
+      "label_counts": {
+        "0": 169108,
+        "1": 692
+      },
+      "anomaly_type_counts": {
+        "normal": 169108,
+        "multi_host_event": 276,
+        "gradual_degradation": 182,
+        "thermal_anomaly": 127,
+        "abrupt_power_drop": 89,
+        "transient_spike": 18
+      }
+    },
+    "test": {
+      "rows": 169800,
+      "steps": 1698,
+      "hosts": 100,
+      "time_start": "2020-01-01 19:17:00",
+      "time_end": "2020-01-01 23:59:50",
+      "label_counts": {
+        "0": 169104,
+        "1": 696
+      },
+      "anomaly_type_counts": {
+        "normal": 169104,
+        "multi_host_event": 280,
+        "gradual_degradation": 180,
+        "thermal_anomaly": 126,
+        "abrupt_power_drop": 92,
+        "transient_spike": 18
+      }
+    }
+  },
+  "event_counts": {
+    "supervised_train": {
+      "abrupt_power_drop": {
+        "baseline": 60
+      },
+      "gradual_degradation": {
+        "baseline": 60
+      },
+      "multi_host_event": {
+        "baseline": 60
+      },
+      "thermal_anomaly": {
+        "baseline": 60
+      },
+      "transient_spike": {
+        "baseline": 60
+      }
+    },
+    "test": {
+      "abrupt_power_drop": {
+        "baseline": 3,
+        "held_out": 3
+      },
+      "gradual_degradation": {
+        "baseline": 3,
+        "held_out": 3
+      },
+      "multi_host_event": {
+        "baseline": 3,
+        "held_out": 3
+      },
+      "thermal_anomaly": {
+        "baseline": 3,
+        "held_out": 3
+      },
+      "transient_spike": {
+        "baseline": 3,
+        "held_out": 3
+      }
+    },
+    "validation": {
+      "abrupt_power_drop": {
+        "baseline": 6
+      },
+      "gradual_degradation": {
+        "baseline": 6
+      },
+      "multi_host_event": {
+        "baseline": 6
+      },
+      "thermal_anomaly": {
+        "baseline": 6
+      },
+      "transient_spike": {
+        "baseline": 6
+      }
+    }
+  },
+  "severity_bands_used": {
+    "supervised_train": {
+      "abrupt_power_drop": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.35,
+              0.5
+            ]
+          }
+        }
+      },
+      "thermal_anomaly": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "temp_offset": [
+              5.0,
+              8.0
+            ]
+          }
+        }
+      },
+      "transient_spike": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              1.35,
+              1.65
+            ]
+          }
+        }
+      },
+      "gradual_degradation": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "final_power_factor": [
+              0.45,
+              0.65
+            ]
+          }
+        }
+      },
+      "multi_host_event": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.6,
+              0.75
+            ],
+            "temp_offset": [
+              2.0,
+              2.0
+            ]
+          }
+        }
+      }
+    },
+    "validation": {
+      "abrupt_power_drop": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.35,
+              0.5
+            ]
+          }
+        }
+      },
+      "thermal_anomaly": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "temp_offset": [
+              5.0,
+              8.0
+            ]
+          }
+        }
+      },
+      "transient_spike": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              1.35,
+              1.65
+            ]
+          }
+        }
+      },
+      "gradual_degradation": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "final_power_factor": [
+              0.45,
+              0.65
+            ]
+          }
+        }
+      },
+      "multi_host_event": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.6,
+              0.75
+            ],
+            "temp_offset": [
+              2.0,
+              2.0
+            ]
+          }
+        }
+      }
+    },
+    "test": {
+      "abrupt_power_drop": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.35,
+              0.5
+            ]
+          }
+        },
+        "held_out": {
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "power_multiplier": [
+              0.2,
+              0.3
+            ]
+          }
+        }
+      },
+      "thermal_anomaly": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "temp_offset": [
+              5.0,
+              8.0
+            ]
+          }
+        },
+        "held_out": {
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "temp_offset": [
+              9.0,
+              12.0
+            ]
+          }
+        }
+      },
+      "transient_spike": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              1.35,
+              1.65
+            ]
+          }
+        },
+        "held_out": {
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "power_multiplier": [
+              1.7,
+              1.9
+            ]
+          }
+        }
+      },
+      "gradual_degradation": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "final_power_factor": [
+              0.45,
+              0.65
+            ]
+          }
+        },
+        "held_out": {
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "final_power_factor": [
+              0.25,
+              0.4
+            ]
+          }
+        }
+      },
+      "multi_host_event": {
+        "baseline": {
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.6,
+              0.75
+            ],
+            "temp_offset": [
+              2.0,
+              2.0
+            ]
+          }
+        },
+        "held_out": {
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "power_multiplier": [
+              0.4,
+              0.55
+            ],
+            "temp_offset": [
+              3.0,
+              5.0
+            ]
+          }
+        }
+      }
+    }
+  },
+  "realized_effects": {
+    "abrupt_power_drop": {
+      "baseline": {
+        "events": 69,
+        "rows": 1034,
+        "target_power_multiplier": {
+          "min": 0.3501503089609412,
+          "median": 0.42555837371854216,
+          "max": 0.4989864176168215
+        },
+        "realized_power_multiplier": {
+          "min": 0.35015030802502617,
+          "median": 0.42555837178858186,
+          "max": 0.4989864187903035
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "duration_steps": {
+          "min": 12.0,
+          "median": 15.0,
+          "max": 18.0
+        }
+      },
+      "held_out": {
+        "events": 3,
+        "rows": 46,
+        "target_power_multiplier": {
+          "min": 0.22725961146865165,
+          "median": 0.24477813690445827,
+          "max": 0.2745462871309338
+        },
+        "realized_power_multiplier": {
+          "min": 0.22725961223486274,
+          "median": 0.2447781364289145,
+          "max": 0.2745462877084609
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "duration_steps": {
+          "min": 14.0,
+          "median": 14.0,
+          "max": 18.0
+        }
+      }
+    },
+    "gradual_degradation": {
+      "baseline": {
+        "events": 69,
+        "rows": 2072,
+        "target_final_power_factor": {
+          "min": 0.4525911101890038,
+          "median": 0.5514998644388748,
+          "max": 0.6498094060406265
+        },
+        "realized_final_power_factor": {
+          "min": 0.4525911153625791,
+          "median": 0.5514998650256498,
+          "max": 0.6498094011537051
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "duration_steps": {
+          "min": 24.0,
+          "median": 30.0,
+          "max": 36.0
+        }
+      },
+      "held_out": {
+        "events": 3,
+        "rows": 90,
+        "target_final_power_factor": {
+          "min": 0.2770597053268887,
+          "median": 0.3423838496746846,
+          "max": 0.3729364903193241
+        },
+        "realized_final_power_factor": {
+          "min": 0.2770597065977196,
+          "median": 0.3423838535319055,
+          "max": 0.3729364895457296
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "duration_steps": {
+          "min": 28.0,
+          "median": 29.0,
+          "max": 33.0
+        }
+      }
+    },
+    "multi_host_event": {
+      "baseline": {
+        "events": 69,
+        "rows": 3176,
+        "target_power_multiplier": {
+          "min": 0.600401232111687,
+          "median": 0.6756619839161319,
+          "max": 0.7498078163178012
+        },
+        "realized_power_multiplier": {
+          "min": 0.600401230938452,
+          "median": 0.6756619855567716,
+          "max": 0.7498078152420329
+        },
+        "target_temp_offset": {
+          "min": 2.0,
+          "median": 2.0,
+          "max": 2.0
+        },
+        "realized_temp_offset": {
+          "min": 2.0,
+          "median": 2.0,
+          "max": 2.0
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.01488095238095238
+        },
+        "duration_steps": {
+          "min": 9.0,
+          "median": 12.0,
+          "max": 14.0
+        }
+      },
+      "held_out": {
+        "events": 3,
+        "rows": 140,
+        "target_power_multiplier": {
+          "min": 0.43320852908004764,
+          "median": 0.4771571568623527,
+          "max": 0.5446879079986456
+        },
+        "realized_power_multiplier": {
+          "min": 0.4332085300589179,
+          "median": 0.47715715774643264,
+          "max": 0.5446879069010416
+        },
+        "target_temp_offset": {
+          "min": 3.144505558745729,
+          "median": 3.78026027280758,
+          "max": 4.3920810490846645
+        },
+        "realized_temp_offset": {
+          "min": 3.1445045471191406,
+          "median": 3.780261993408203,
+          "max": 4.392082214355469
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.0
+        },
+        "duration_steps": {
+          "min": 9.0,
+          "median": 12.0,
+          "max": 14.0
+        }
+      }
+    },
+    "thermal_anomaly": {
+      "baseline": {
+        "events": 69,
+        "rows": 1452,
+        "target_temp_offset": {
+          "min": 5.044339782610521,
+          "median": 6.549727923155568,
+          "max": 7.972208396173336
+        },
+        "realized_temp_offset": {
+          "min": 5.044338226318359,
+          "median": 6.5497283935546875,
+          "max": 7.972209930419922
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.5555555555555556
+        },
+        "duration_steps": {
+          "min": 18.0,
+          "median": 21.0,
+          "max": 24.0
+        }
+      },
+      "held_out": {
+        "events": 3,
+        "rows": 64,
+        "target_temp_offset": {
+          "min": 9.524105459611716,
+          "median": 10.16346415468915,
+          "max": 11.264667271906685
+        },
+        "realized_temp_offset": {
+          "min": 9.524105072021484,
+          "median": 10.163463592529297,
+          "max": 11.264667510986328
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.031746031746031744,
+          "max": 0.39766081871345027
+        },
+        "duration_steps": {
+          "min": 19.0,
+          "median": 21.0,
+          "max": 24.0
+        }
+      }
+    },
+    "transient_spike": {
+      "baseline": {
+        "events": 69,
+        "rows": 207,
+        "target_power_multiplier": {
+          "min": 1.3514659697341254,
+          "median": 1.5046584534465648,
+          "max": 1.6491533328023849
+        },
+        "realized_power_multiplier": {
+          "min": 1.3514659682763792,
+          "median": 1.5046584310322613,
+          "max": 1.6491533644655918
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.0,
+          "max": 0.8
+        },
+        "duration_steps": {
+          "min": 2.0,
+          "median": 3.0,
+          "max": 4.0
+        }
+      },
+      "held_out": {
+        "events": 3,
+        "rows": 9,
+        "target_power_multiplier": {
+          "min": 1.7532568585240724,
+          "median": 1.8053117565550159,
+          "max": 1.8947921010852378
+        },
+        "realized_power_multiplier": {
+          "min": 1.7532568481338267,
+          "median": 1.8053117639878218,
+          "max": 1.8947920938225509
+        },
+        "envelope_exceed_fraction": {
+          "min": 0.0,
+          "median": 0.1,
+          "max": 0.1
+        },
+        "duration_steps": {
+          "min": 2.0,
+          "median": 3.0,
+          "max": 4.0
+        }
+      }
+    }
+  },
+  "envelope_descriptive": {
+    "gpu0_core_temp": {
+      "min": 22.85,
+      "max": 48.65
+    },
+    "gpu0_mem_temp": {
+      "min": 19.2625,
+      "max": 52.1125
+    },
+    "gpu1_core_temp": {
+      "min": 21.688888931274413,
+      "max": 49.42222175598145
+    },
+    "gpu1_mem_temp": {
+      "min": 18.95,
+      "max": 55.55
+    },
+    "gpu2_core_temp": {
+      "min": 21.4,
+      "max": 52.6
+    },
+    "gpu2_mem_temp": {
+      "min": 18.82222213745117,
+      "max": 56.95555648803711
+    },
+    "gpu3_core_temp": {
+      "min": 21.8,
+      "max": 48.2
+    },
+    "gpu3_mem_temp": {
+      "min": 19.2,
+      "max": 52.8
+    },
+    "gpu4_core_temp": {
+      "min": 21.7,
+      "max": 49.3
+    },
+    "gpu4_mem_temp": {
+      "min": 18.022222137451173,
+      "max": 53.75555648803711
+    },
+    "gpu5_core_temp": {
+      "min": 20.3,
+      "max": 64.7
+    },
+    "gpu5_mem_temp": {
+      "min": 17.775,
+      "max": 68.475
+    },
+    "p0_gpu0_power": {
+      "min": 2.386111450195312,
+      "max": 336.7527740478516
+    },
+    "p0_gpu1_power": {
+      "min": 3.099999999999998,
+      "max": 337.9
+    },
+    "p0_gpu2_power": {
+      "min": 2.871100262450902,
+      "max": 339.08456886596974
+    },
+    "p0_power": {
+      "min": -1.1208326339721708,
+      "max": 256.32916660308837
+    },
+    "p0_temp_max": {
+      "min": 15.899999999999999,
+      "max": 77.1
+    },
+    "p0_temp_mean": {
+      "min": 18.238724915313718,
+      "max": 48.333276816558836
+    },
+    "p0_temp_min": {
+      "min": 18.511110877990724,
+      "max": 43.044444465637206
+    },
+    "p1_gpu0_power": {
+      "min": 2.3222217559814453,
+      "max": 335.7888889312744
+    },
+    "p1_gpu1_power": {
+      "min": 3.388888549804687,
+      "max": 334.72222595214845
+    },
+    "p1_gpu2_power": {
+      "min": 0.8497120712277919,
+      "max": 334.65315958709976
+    },
+    "p1_power": {
+      "min": -0.19999980926513672,
+      "max": 246.20000553131104
+    },
+    "p1_temp_max": {
+      "min": 17.888888931274415,
+      "max": 55.222221755981444
+    },
+    "p1_temp_mean": {
+      "min": 18.198544568634006,
+      "max": 50.34040603103669
+    },
+    "p1_temp_min": {
+      "min": 18.45555477142334,
+      "max": 44.98888988494873
+    },
+    "ps0_input_power": {
+      "min": 81.31554565429687,
+      "max": 1598.8622497558595
+    },
+    "ps1_input_power": {
+      "min": 167.83876511230469,
+      "max": 1102.241930444336
+    }
+  },
+  "validation": {
+    "overall": "PASS",
+    "checks": [
+      {
+        "id": "C01",
+        "name": "source_audit",
+        "status": "PASS",
+        "details": "complete panel, regular interval, normal-only labels, finite uniform-dtype features; 0 pre-existing temperature-summary violations recorded",
+        "measured": {
+          "rows": 864000,
+          "hosts": 100,
+          "timestamps": 8640,
+          "complete_panel": true,
+          "duplicate_host_time_rows": 0,
+          "source_label_nonzero": 0,
+          "interval_seconds_top_counts": {
+            "10": 8639
+          },
+          "irregular_intervals": 0,
+          "feature_dtype": "float32",
+          "feature_count": 28,
+          "power_features": 10,
+          "temperature_features": 18,
+          "preexisting_summary_violations": 0,
+          "time_start": "2020-01-01 00:00:00",
+          "time_end": "2020-01-01 23:59:50"
+        }
+      },
+      {
+        "id": "C02",
+        "name": "source_file_unchanged",
+        "status": "PASS",
+        "details": "SHA-256 identical before and after",
+        "measured": {
+          "sha256": "93c2013f3ca5b660e44b1383c65fc180ed2ffca5fc70d53d7ae67b0fd53e21a7"
+        }
+      },
+      {
+        "id": "C03",
+        "name": "split_boundaries_and_purge",
+        "status": "PASS",
+        "details": "3 chronological partitions, 30-timestamp purge gaps, no shared rows or timestamps",
+        "measured": {
+          "steps": {
+            "supervised_train": 5184,
+            "validation": 1698,
+            "test": 1698
+          },
+          "purged_rows": 6000
+        }
+      },
+      {
+        "id": "C04",
+        "name": "host_pool_separation",
+        "status": "PASS",
+        "details": "anomaly hosts are disjoint across supervised_train / validation / test (every host still appears as normal data in every partition)",
+        "measured": {
+          "pool_sizes": {
+            "supervised_train": 34,
+            "validation": 33,
+            "test": 33
+          },
+          "hosts_used": {
+            "supervised_train": 34,
+            "validation": 33,
+            "test": 33
+          }
+        }
+      },
+      {
+        "id": "C05",
+        "name": "normal_train_preserved",
+        "status": "PASS",
+        "details": "518,400 rows, all labels 0, every source column identical to the source rows",
+        "measured": {}
+      },
+      {
+        "id": "C06",
+        "name": "supervised_copy_integrity",
+        "status": "PASS",
+        "details": "same 518,400 rows/order as normal train; only the 6,902 labelled rows differ",
+        "measured": {}
+      },
+      {
+        "id": "C07",
+        "name": "label_consistency",
+        "status": "PASS",
+        "details": "label, anomaly_type and event_id agree in all three labelled datasets",
+        "measured": {
+          "supervised_train": 6902,
+          "validation": 692,
+          "test": 696
+        }
+      },
+      {
+        "id": "C08",
+        "name": "event_manifest_matches_data",
+        "status": "PASS",
+        "details": "360 events: labelled rows equal hosts x window for every event",
+        "measured": {
+          "events": 360
+        }
+      },
+      {
+        "id": "C09",
+        "name": "event_parameters_and_placement",
+        "status": "PASS",
+        "details": "counts, durations, host counts, band ranges, edge margins and overlap/guard rules all respected",
+        "measured": {
+          "policies": {
+            "supervised_train": "per_host",
+            "validation": "global",
+            "test": "global"
+          }
+        }
+      },
+      {
+        "id": "C10",
+        "name": "realized_effects",
+        "status": "PASS",
+        "details": "every event re-measured on the final frames: correct direction/magnitude, unrelated features and unlabelled rows unchanged, every labelled row changed, manifest values match",
+        "measured": {}
+      },
+      {
+        "id": "C11",
+        "name": "schema_dtype_finite",
+        "status": "PASS",
+        "details": "identical columns/dtypes in all 4 datasets; 28 finite float32 features",
+        "measured": {}
+      },
+      {
+        "id": "C12",
+        "name": "temperature_summary_no_new_violations",
+        "status": "PASS",
+        "details": "no new min<=mean<=max violations (pre-existing source violations are recorded, not altered)",
+        "measured": {
+          "train": {
+            "violations": 0,
+            "in_source_rows": 0
+          },
+          "supervised_train": {
+            "violations": 0,
+            "in_source_rows": 0
+          },
+          "validation": {
+            "violations": 0,
+            "in_source_rows": 0
+          },
+          "test": {
+            "violations": 0,
+            "in_source_rows": 0
+          }
+        }
+      },
+      {
+        "id": "C13",
+        "name": "held_out_separation",
+        "status": "PASS",
+        "details": "held-out events appear only in test; no other event has parameters inside a held-out range",
+        "measured": {
+          "held_out_events": 15,
+          "held_out_rows": 349
+        }
+      },
+      {
+        "id": "C14",
+        "name": "plan_reproducibility",
+        "status": "PASS",
+        "details": "event plan re-derived from the seed is identical (full-content determinism is covered by the test suite)",
+        "measured": {}
+      },
+      {
+        "id": "C15",
+        "name": "capacity_feasibility",
+        "status": "PASS",
+        "details": "all configured events were placed without shortening or dropping",
+        "measured": {
+          "supervised_train": {
+            "usable_steps": 5124,
+            "events": 300,
+            "event_steps": 4832,
+            "pool_hosts": 34
+          },
+          "validation": {
+            "usable_steps": 1638,
+            "events": 30,
+            "event_steps": 485,
+            "pool_hosts": 33
+          },
+          "test": {
+            "usable_steps": 1638,
+            "events": 30,
+            "event_steps": 486,
+            "pool_hosts": 33
+          }
+        }
+      },
+      {
+        "id": "C16",
+        "name": "protected_files_unchanged",
+        "status": "PASS",
+        "details": "4 protected path(s) unchanged",
+        "measured": {}
+      },
+      {
+        "id": "C17",
+        "name": "artifacts_readback",
+        "status": "PASS",
+        "details": "parquet files and event manifests re-read identical to memory",
+        "measured": {}
+      }
+    ]
+  },
+  "content_digests": {
+    "train": "7a4c49d65bd34b8e73542415a133b63ab969d6980245142bd187e248b785e8e3",
+    "supervised_train": "50fc97a2704a2fa9248816e91656902a254fa92d47131b93654dd5757e01735e",
+    "validation": "23a60671a30103b48a9cb985611af40c996332026d18feed228ab6fd4a56529c",
+    "test": "0ef7dac3231d1276c662931d82a74c3be2f0096aafc9278822f871b859e13fe3",
+    "events_csv_sha256": "aeb500722585dab18b573d947cce1bf58a4e67362f29417150159409b150a29b"
+  },
+  "assumptions": [
+    "Baseline severity ranges are the existing generator's configuration, not measured fault statistics.",
+    "Held-out severity bands are PROPOSED and not validated; stronger anomalies test extrapolation to more severe faults, not generalization to unseen anomaly categories (and are likely easier to detect).",
+    "One multiplier is applied to all power features and one offset to all temperature features (including min/mean/max summaries, which therefore keep their ordering). Real hardware may not behave this way.",
+    "Step durations are converted to time with the audited 10 s sampling interval.",
+    "Guard and edge margins (30 steps) are configurable design choices, chosen to match the 30-step sequence window.",
+    "The training-derived envelope is descriptive; events are never clipped to it."
+  ],
+  "limitations": [
+    "A passing run certifies data generation only; it does not show that synthetic anomalies resemble real faults.",
+    "It does not show model performance, generalization, or that a validation false-positive-rate target is met.",
+    "Host separation covers where anomalies are injected; every host appears as normal data in every partition.",
+    "Rows inside an event are strongly autocorrelated; evaluate at event level and do not treat rows as independent."
+  ]
+}

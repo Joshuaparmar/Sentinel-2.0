@@ -1,0 +1,163 @@
+SENTINEL 2.0 — READ-ONLY PROJECT INVENTORY
+Project root: C:\Users\Shirley\joshua\CRCE\CAPSTONE\Sentinel_2.0
+Generated UTC: 2026-10-22T14:38:38.102175+00:00
+
+SUMMARY
+Directories: 36
+Files: 107
+Total file size: 1,370,202,946 bytes
+
+ROOT FILES
+  README.md
+
+DIRECTORIES
+  configs/
+  data/
+  data/original/
+  data/processed/
+  data/synthetic/
+  data/synthetic_v3/
+  docs/
+  experiments/
+  experiments/v3_xgboost_run_001/
+  experiments/v3_xgboost_run_001/model/
+  experiments/v3_xgboost_run_001/predictions/
+  experiments/v3_xgboost_run_001/reports/
+  models/
+  models/comparison/
+  models/comparison_v3_run_001/
+  reports/
+  reports/feature_ablation/
+  reports/feature_residual_diagnostic/
+  reports/feature_residual_diagnostic/baseline_25_iterations/
+  reports/model_comparison/
+  reports/model_comparison_v3_run_001/
+  reports/pre_supervised_benchmark_backup_20261021_225935/
+  reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/
+  reports/pre_supervised_benchmark_backup_20261021_225935/models/
+  scripts/
+  src/
+  src/sentinel/
+  src/sentinel_generator_package/
+  src/sentinel_generator_package/sentinel_generator_package/
+  src/sentinel_generator_package/sentinel_generator_package/src/
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/
+  src/sentinel_generator_package/sentinel_generator_package/tests/
+  src/sentinel_generator_package_v3/
+  synthetic_output_v1/
+  synthetic_output_v2/
+  tests/
+
+FILES
+  data/synthetic/synthetic_dataset_report.txt  |  1,689 bytes
+  data/synthetic/synthetic_test.parquet  |  6,816,238 bytes
+  data/synthetic/synthetic_train.parquet  |  20,725,363 bytes
+  data/synthetic/synthetic_val.parquet  |  6,955,465 bytes
+  data/synthetic_v3/feature_manifest.json  |  2,021 bytes
+  data/synthetic_v3/generation_config.json  |  6,610 bytes
+  data/synthetic_v3/synthetic_events.csv  |  94,684 bytes
+  data/synthetic_v3/synthetic_report.json  |  32,596 bytes
+  data/synthetic_v3/synthetic_report.txt  |  9,609 bytes
+  data/synthetic_v3/synthetic_supervised_train.parquet  |  24,212,161 bytes
+  data/synthetic_v3/synthetic_supervised_train_events.csv  |  79,665 bytes
+  data/synthetic_v3/synthetic_test.parquet  |  7,695,163 bytes
+  data/synthetic_v3/synthetic_train.parquet  |  23,073,416 bytes
+  data/synthetic_v3/synthetic_val.parquet  |  7,790,035 bytes
+  data/synthetic_v3/validation_results.json  |  6,236 bytes
+  docs/PROJECT_PLAN.md  |  0 bytes
+  experiments/v3_xgboost_run_001/model/xgboost_v3.json  |  1,897,410 bytes
+  experiments/v3_xgboost_run_001/predictions/test_predictions.parquet  |  2,016,096 bytes
+  experiments/v3_xgboost_run_001/reports/experiment_report.json  |  6,695 bytes
+  experiments/v3_xgboost_run_001/reports/feature_importance.csv  |  762 bytes
+  experiments/v3_xgboost_run_001/reports/test_event_detection.csv  |  3,233 bytes
+  models/comparison/lightgbm_supervised.joblib  |  1,057,348 bytes
+  models/comparison/preprocessing.json  |  3,042 bytes
+  models/comparison/xgboost_supervised.joblib  |  927,433 bytes
+  models/comparison_v3_run_001/cnn_autoencoder_state_dict.pt  |  38,295 bytes
+  models/comparison_v3_run_001/dense_autoencoder.joblib  |  78,196 bytes
+  models/comparison_v3_run_001/gaussian_mixture.joblib  |  4,811 bytes
+  models/comparison_v3_run_001/isolation_forest.joblib  |  2,571,181 bytes
+  models/comparison_v3_run_001/lightgbm_supervised.joblib  |  1,057,812 bytes
+  models/comparison_v3_run_001/lstm_autoencoder_state_dict.pt  |  155,849 bytes
+  models/comparison_v3_run_001/pca_reconstruction.joblib  |  3,514 bytes
+  models/comparison_v3_run_001/preprocessing.json  |  3,045 bytes
+  models/comparison_v3_run_001/xgboost_comparison_run.joblib  |  1,155,153 bytes
+  README.md  |  0 bytes
+  reports/feature_ablation/ablation_metadata.json  |  2,261 bytes
+  reports/feature_ablation/ablation_scores_test.csv  |  51,964,674 bytes
+  reports/feature_ablation/ablation_summary.csv  |  2,020 bytes
+  reports/feature_residual_diagnostic/baseline_25_iterations/channel_separation_summary.csv  |  567 bytes
+  reports/feature_residual_diagnostic/baseline_25_iterations/run_metadata.json  |  2,543 bytes
+  reports/feature_residual_diagnostic/baseline_25_iterations/test_residual_scores.csv  |  86,271,931 bytes
+  reports/feature_residual_diagnostic/baseline_25_iterations/validation_residual_scores.csv  |  15,047,768 bytes
+  reports/feature_residual_diagnostic/channel_separation_summary.csv  |  569 bytes
+  reports/feature_residual_diagnostic/run_metadata.json  |  2,765 bytes
+  reports/feature_residual_diagnostic/test_residual_scores.csv  |  86,823,539 bytes
+  reports/feature_residual_diagnostic/validation_residual_scores.csv  |  15,116,009 bytes
+  reports/model_comparison/anomaly_type_diagnostics.csv  |  4,168 bytes
+  reports/model_comparison/dense_ae_type_score_separation.csv  |  519 bytes
+  reports/model_comparison/false_positive_burden.csv  |  1,581 bytes
+  reports/model_comparison/feature_deviation_by_anomaly_type.csv  |  3,752 bytes
+  reports/model_comparison/missed_abrupt_power_drop_rows.csv  |  1,532 bytes
+  reports/model_comparison/model_comparison.csv  |  2,202 bytes
+  reports/model_comparison/model_comparison.json  |  5,136 bytes
+  reports/model_comparison/row_scores_test.csv  |  160,735,173 bytes
+  reports/model_comparison/row_scores_validation.csv  |  160,725,930 bytes
+  reports/model_comparison/run_metadata.json  |  7,610 bytes
+  reports/model_comparison_v3_run_001/anomaly_type_diagnostics.csv  |  5,246 bytes
+  reports/model_comparison_v3_run_001/false_positive_burden.csv  |  1,453 bytes
+  reports/model_comparison_v3_run_001/model_comparison.csv  |  8,659 bytes
+  reports/model_comparison_v3_run_001/model_comparison.json  |  15,718 bytes
+  reports/model_comparison_v3_run_001/row_scores_test.csv  |  186,761,762 bytes
+  reports/model_comparison_v3_run_001/row_scores_validation.csv  |  164,342,717 bytes
+  reports/model_comparison_v3_run_001/run_metadata.json  |  20,472 bytes
+  reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/model_comparison.csv  |  1,795 bytes
+  reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/model_comparison.json  |  3,916 bytes
+  reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/row_scores_test.csv  |  121,242,077 bytes
+  reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/row_scores_validation.csv  |  121,215,307 bytes
+  reports/pre_supervised_benchmark_backup_20261021_225935/model_comparison/run_metadata.json  |  6,026 bytes
+  reports/pre_supervised_benchmark_backup_20261021_225935/models/preprocessing.json  |  3,042 bytes
+  scripts/audit_supervised_data.py  |  1,869 bytes
+  scripts/project_inventory.py  |  4,941 bytes
+  scripts/sentinel_feature_ablation.py  |  10,426 bytes
+  scripts/sentinel_feature_diagnostics.py  |  5,458 bytes
+  scripts/sentinel_model_comparison.before_supervised.bak  |  24,738 bytes
+  scripts/sentinel_model_comparison.py  |  27,733 bytes
+  scripts/sentinel_model_comparison_v3.before_full_replacement.bak  |  33,836 bytes
+  scripts/sentinel_model_comparison_v3.prebaseline.bak  |  30,408 bytes
+  scripts/sentinel_model_comparison_v3.prepatch.bak  |  27,733 bytes
+  scripts/sentinel_model_comparison_v3.py  |  35,781 bytes
+  scripts/sentinel_residual_diagnostic.py  |  8,136 bytes
+  scripts/sentinel_xgboost_v3.py  |  14,572 bytes
+  src/sentinel/generate_synthetic.py  |  12,428 bytes
+  src/sentinel_generator_package/sentinel_generator_package/README.md  |  861 bytes
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py  |  26,633 bytes
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py.bak  |  24,678 bytes
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py.metrics_backup  |  24,990 bytes
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic.py.precision_backup  |  24,824 bytes
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic_v3.py  |  26,633 bytes
+  src/sentinel_generator_package/sentinel_generator_package/src/sentinel/generate_synthetic_v3.py.bak_20261022_172008  |  26,633 bytes
+  src/sentinel_generator_package/sentinel_generator_package/tests/test_generate_synthetic.py  |  5,968 bytes
+  src/sentinel_generator_package_v3/generate_synthetic_v3.py  |  86,418 bytes
+  src/sentinel_generator_package_v3/test_generate_synthetic_v3.py  |  33,464 bytes
+  synthetic_output_v1/feature_manifest.json  |  1,013 bytes
+  synthetic_output_v1/synthetic_events.csv  |  1,365 bytes
+  synthetic_output_v1/synthetic_report.json  |  9,532 bytes
+  synthetic_output_v1/synthetic_report.txt  |  1,484 bytes
+  synthetic_output_v1/synthetic_test.parquet  |  6,927,577 bytes
+  synthetic_output_v1/synthetic_train.parquet  |  20,726,294 bytes
+  synthetic_output_v1/synthetic_val.parquet  |  7,079,638 bytes
+  synthetic_output_v2/feature_manifest.json  |  1,013 bytes
+  synthetic_output_v2/synthetic_events.csv  |  1,548 bytes
+  synthetic_output_v2/synthetic_report.json  |  9,667 bytes
+  synthetic_output_v2/synthetic_report.txt  |  1,484 bytes
+  synthetic_output_v2/synthetic_supervised_train.parquet  |  21,350,561 bytes
+  synthetic_output_v2/synthetic_supervised_train_events.csv  |  7,835 bytes
+  synthetic_output_v2/synthetic_test.parquet  |  6,927,577 bytes
+  synthetic_output_v2/synthetic_train.parquet  |  20,726,294 bytes
+  synthetic_output_v2/synthetic_val.parquet  |  7,079,638 bytes
+
+ERRORS
+  None
+
+Note: .git, virtual environments, caches, and node_modules were excluded.

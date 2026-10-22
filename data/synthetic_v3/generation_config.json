@@ -1,0 +1,312 @@
+{
+  "seed": 42,
+  "train_frac": 0.6,
+  "val_frac": 0.2,
+  "purge_steps": 30,
+  "edge_margin_steps": 30,
+  "guard_steps": 30,
+  "sample_interval_seconds": 10,
+  "feature_dtype": "float32",
+  "max_placement_attempts": 1000,
+  "allow_band_overlap": false,
+  "realized_ratio_tol": 0.0001,
+  "realized_offset_tol": 0.001,
+  "power_floor": 1e-06,
+  "envelope_quantiles": [
+    0.001,
+    0.999
+  ],
+  "envelope_headroom": 0.1,
+  "scenarios": {
+    "abrupt_power_drop": {
+      "name": "abrupt_power_drop",
+      "dimensions": [
+        {
+          "name": "power_multiplier",
+          "kind": "multiplier",
+          "direction": "decrease"
+        }
+      ],
+      "duration_steps": [
+        12,
+        18
+      ],
+      "hosts": [
+        1,
+        1
+      ],
+      "bands": [
+        {
+          "name": "baseline",
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.35,
+              0.5
+            ]
+          }
+        },
+        {
+          "name": "held_out",
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "power_multiplier": [
+              0.2,
+              0.3
+            ]
+          }
+        }
+      ]
+    },
+    "thermal_anomaly": {
+      "name": "thermal_anomaly",
+      "dimensions": [
+        {
+          "name": "temp_offset",
+          "kind": "additive_offset",
+          "direction": "increase"
+        }
+      ],
+      "duration_steps": [
+        18,
+        24
+      ],
+      "hosts": [
+        1,
+        1
+      ],
+      "bands": [
+        {
+          "name": "baseline",
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "temp_offset": [
+              5.0,
+              8.0
+            ]
+          }
+        },
+        {
+          "name": "held_out",
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "temp_offset": [
+              9.0,
+              12.0
+            ]
+          }
+        }
+      ]
+    },
+    "transient_spike": {
+      "name": "transient_spike",
+      "dimensions": [
+        {
+          "name": "power_multiplier",
+          "kind": "multiplier",
+          "direction": "increase"
+        }
+      ],
+      "duration_steps": [
+        2,
+        4
+      ],
+      "hosts": [
+        1,
+        1
+      ],
+      "bands": [
+        {
+          "name": "baseline",
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              1.35,
+              1.65
+            ]
+          }
+        },
+        {
+          "name": "held_out",
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "power_multiplier": [
+              1.7,
+              1.9
+            ]
+          }
+        }
+      ]
+    },
+    "gradual_degradation": {
+      "name": "gradual_degradation",
+      "dimensions": [
+        {
+          "name": "final_power_factor",
+          "kind": "final_factor",
+          "direction": "decrease"
+        }
+      ],
+      "duration_steps": [
+        24,
+        36
+      ],
+      "hosts": [
+        1,
+        1
+      ],
+      "bands": [
+        {
+          "name": "baseline",
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "final_power_factor": [
+              0.45,
+              0.65
+            ]
+          }
+        },
+        {
+          "name": "held_out",
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "final_power_factor": [
+              0.25,
+              0.4
+            ]
+          }
+        }
+      ]
+    },
+    "multi_host_event": {
+      "name": "multi_host_event",
+      "dimensions": [
+        {
+          "name": "power_multiplier",
+          "kind": "multiplier",
+          "direction": "decrease"
+        },
+        {
+          "name": "temp_offset",
+          "kind": "additive_offset",
+          "direction": "increase"
+        }
+      ],
+      "duration_steps": [
+        9,
+        14
+      ],
+      "hosts": [
+        4,
+        4
+      ],
+      "bands": [
+        {
+          "name": "baseline",
+          "held_out": false,
+          "status": "baseline_existing",
+          "ranges": {
+            "power_multiplier": [
+              0.6,
+              0.75
+            ],
+            "temp_offset": [
+              2.0,
+              2.0
+            ]
+          }
+        },
+        {
+          "name": "held_out",
+          "held_out": true,
+          "status": "proposed_unvalidated",
+          "ranges": {
+            "power_multiplier": [
+              0.4,
+              0.55
+            ],
+            "temp_offset": [
+              3.0,
+              5.0
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "split_plans": {
+    "supervised_train": {
+      "placement": "per_host",
+      "event_counts": {
+        "abrupt_power_drop": {
+          "baseline": 60
+        },
+        "thermal_anomaly": {
+          "baseline": 60
+        },
+        "transient_spike": {
+          "baseline": 60
+        },
+        "gradual_degradation": {
+          "baseline": 60
+        },
+        "multi_host_event": {
+          "baseline": 60
+        }
+      }
+    },
+    "validation": {
+      "placement": "global",
+      "event_counts": {
+        "abrupt_power_drop": {
+          "baseline": 6
+        },
+        "thermal_anomaly": {
+          "baseline": 6
+        },
+        "transient_spike": {
+          "baseline": 6
+        },
+        "gradual_degradation": {
+          "baseline": 6
+        },
+        "multi_host_event": {
+          "baseline": 6
+        }
+      }
+    },
+    "test": {
+      "placement": "global",
+      "event_counts": {
+        "abrupt_power_drop": {
+          "baseline": 3,
+          "held_out": 3
+        },
+        "thermal_anomaly": {
+          "baseline": 3,
+          "held_out": 3
+        },
+        "transient_spike": {
+          "baseline": 3,
+          "held_out": 3
+        },
+        "gradual_degradation": {
+          "baseline": 3,
+          "held_out": 3
+        },
+        "multi_host_event": {
+          "baseline": 3,
+          "held_out": 3
+        }
+      }
+    }
+  }
+}
