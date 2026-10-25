@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENTINEL 2.0 Model Comparison Report</title>
+<style>
+body { font-family: Arial, sans-serif; max-width: 1100px; margin: 30px auto;
+padding: 0 22px; color: #202124; line-height: 1.55; }
+h1 { border-bottom: 3px solid #333; padding-bottom: 12px; }
+.card { border: 1px solid #ddd; border-radius: 8px; padding: 18px; margin: 18px 0; }
+.warning { background: #fff8e6; padding: 12px; border-left: 4px solid #d99b00; }
+table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+th, td { border-bottom: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+img { width: 100%; height: auto; }
+section { margin: 28px 0; }
+</style>
+</head>
+<body>
+<h1>SENTINEL 2.0 — Model Comparison Report</h1>
+<p>Source results: <code>reports\model_comparison\model_comparison.csv</code></p>
+
+<div class="warning"><b>Important:</b> The selected model is the top candidate
+under the recorded metrics, not automatically production-ready. Results depend
+on the test data, labels, training procedure, and threshold policy. Sequence
+and row-based models may be evaluated on different units and should not be
+compared directly.</div>
+
+<h2>1. Selected model</h2>
+<div class="card">
+<h3>XGBoost</h3>
+<p><b>Selection basis:</b> average precision = 0.8541; F1 = 0.0817; precision = 0.0428; recall = 0.8667; false-positive rate = 0.0118</p>
+<p>The default ranking prioritizes average precision for rare anomalies, then
+uses F1, precision, and recall as supporting metrics where available. Row-based
+models are preferred for the main selection when those results are identifiable.</p>
+</div>
+
+<h2>2. All-model comparison</h2>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>model</th>
+      <th>evaluation_group</th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1</th>
+      <th>average_precision</th>
+      <th>roc_auc</th>
+      <th>false_positive_rate</th>
+      <th>tp</th>
+      <th>fp</th>
+      <th>fn</th>
+      <th>threshold</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Isolation Forest</td>
+      <td>all test rows</td>
+      <td>0.0084</td>
+      <td>0.1048</td>
+      <td>0.0155</td>
+      <td>0.0198</td>
+      <td>N/A</td>
+      <td>0.0076</td>
+      <td>11.0000</td>
+      <td>1303.0000</td>
+      <td>94.0000</td>
+      <td>0.5498</td>
+    </tr>
+    <tr>
+      <td>PCA</td>
+      <td>all test rows</td>
+      <td>0.0025</td>
+      <td>0.0286</td>
+      <td>0.0045</td>
+      <td>0.0017</td>
+      <td>N/A</td>
+      <td>0.0070</td>
+      <td>3.0000</td>
+      <td>1211.0000</td>
+      <td>102.0000</td>
+      <td>0.0111</td>
+    </tr>
+    <tr>
+      <td>Gaussian Mixture Model</td>
+      <td>all test rows</td>
+      <td>0.0081</td>
+      <td>0.2095</td>
+      <td>0.0156</td>
+      <td>0.0059</td>
+      <td>N/A</td>
+      <td>0.0156</td>
+      <td>22.0000</td>
+      <td>2693.0000</td>
+      <td>83.0000</td>
+      <td>53.6820</td>
+    </tr>
+    <tr>
+      <td>LightGBM</td>
+      <td>all test rows</td>
+      <td>0.0288</td>
+      <td>0.7333</td>
+      <td>0.0554</td>
+      <td>0.0221</td>
+      <td>N/A</td>
+      <td>0.0151</td>
+      <td>77.0000</td>
+      <td>2599.0000</td>
+      <td>28.0000</td>
+      <td>0.0001</td>
+    </tr>
+    <tr>
+      <td>XGBoost</td>
+      <td>all test rows</td>
+      <td>0.0428</td>
+      <td>0.8667</td>
+      <td>0.0817</td>
+      <td>0.8541</td>
+      <td>N/A</td>
+      <td>0.0118</td>
+      <td>91.0000</td>
+      <td>2033.0000</td>
+      <td>14.0000</td>
+      <td>0.0090</td>
+    </tr>
+    <tr>
+      <td>Dense Autoencoder</td>
+      <td>all test rows</td>
+      <td>0.0556</td>
+      <td>0.6571</td>
+      <td>0.1024</td>
+      <td>0.0705</td>
+      <td>N/A</td>
+      <td>0.0068</td>
+      <td>69.0000</td>
+      <td>1173.0000</td>
+      <td>36.0000</td>
+      <td>0.0366</td>
+    </tr>
+    <tr>
+      <td>1D-CNN Autoencoder</td>
+      <td>sequence endpoint rows</td>
+      <td>0.0063</td>
+      <td>0.1429</td>
+      <td>0.0121</td>
+      <td>0.0109</td>
+      <td>N/A</td>
+      <td>0.0139</td>
+      <td>15.0000</td>
+      <td>2356.0000</td>
+      <td>90.0000</td>
+      <td>0.2667</td>
+    </tr>
+    <tr>
+      <td>LSTM Autoencoder</td>
+      <td>sequence endpoint rows</td>
+      <td>0.0057</td>
+      <td>0.0857</td>
+      <td>0.0108</td>
+      <td>0.0057</td>
+      <td>N/A</td>
+      <td>0.0092</td>
+      <td>9.0000</td>
+      <td>1560.0000</td>
+      <td>96.0000</td>
+      <td>0.7804</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Understanding the metrics</h2>
+
+    <ul>
+      <li><b>Precision:</b> Of the rows flagged, how many were truly anomalous.</li>
+      <li><b>Recall:</b> Of the labelled anomalies, how many were detected.</li>
+      <li><b>F1:</b> Combines precision and recall into one score.</li>
+      <li><b>Average precision:</b> Summarizes the precision-recall curve and is
+      particularly informative when anomalies are rare.</li>
+      <li><b>ROC-AUC:</b> Measures how well scores rank positives above negatives
+      over different thresholds.</li>
+      <li><b>False-positive rate:</b> The fraction of normal rows incorrectly
+      flagged as anomalous.</li>
+    </ul>
+    
+
+<h2>4. Visualizations</h2>
+<section><h3>Average precision (PR-AUC)</h3><p>Higher is better; useful for rare anomalies.</p><img src="figures/average_precision.png" alt="Average precision (PR-AUC)"></section>
+<section><h3>F1 score</h3><p>Balances precision and recall.</p><img src="figures/f1.png" alt="F1 score"></section>
+<section><h3>Precision</h3><p>Fraction of alerts that were true anomalies.</p><img src="figures/precision.png" alt="Precision"></section>
+<section><h3>Recall</h3><p>Fraction of labelled anomalies detected.</p><img src="figures/recall.png" alt="Recall"></section>
+<section><h3>False-positive rate</h3><p>Fraction of normal rows incorrectly flagged.</p><img src="figures/false_positive_rate.png" alt="False-positive rate"></section>
+<section><h3>Detection outcomes</h3><p>True detections, false alarms, and missed anomalies.</p><img src="figures/detection_counts.png" alt="Detection outcomes"></section>
+
+<h2>5. Conclusion</h2>
+<p>Based on this run, <b>XGBoost</b> is the provisional benchmark choice
+under the ranking policy above. The strongest model depends on the project's
+actual goal: catching as many anomalies as possible, reducing false alarms,
+or balancing the two. Review its false-positive burden and missed anomalies
+before calling it the best operational model.</p>
+
+<h2>6. Limitations and next steps</h2>
+<ul>
+<li>Verify that the test set is independent of training and validation data.</li>
+<li>Choose thresholds on validation data rather than tuning on final test labels.</li>
+<li>Inspect false positives and missed anomalies by host, time, and scenario if
+those fields are available in the original predictions.</li>
+<li>Confirm whether sequence and row-based models score the same test population.</li>
+<li>For supervised models, check whether training anomalies resemble real
+deployment anomalies.</li>
+<li>Save the chosen model, preprocessing configuration, feature list, and
+threshold together for reproducibility.</li>
+</ul>
+<p>Generated by <code>scripts/generate_model_report.py</code>.</p>
+</body>
+</html>
